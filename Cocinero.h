@@ -13,7 +13,7 @@
 
 class Cocinero: public Empleado {
 private:
-    std::queue<Plato> cCocinar;
+    std::queue<Plato> colaCocinar;
 
 public:
     void Cocinar();

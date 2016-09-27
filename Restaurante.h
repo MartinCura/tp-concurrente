@@ -14,7 +14,7 @@ private:
     int cantDeRecepcionistas,
         cantMozos,
         cantMesas;
-    std::list<Plato> mapPlatos; // Plato, precio. Considerar hacer la clase Plato, en cuyo caso cambiar por una lista.
+    std::list<Plato> listPlatos;
 };
 
 
