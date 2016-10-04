@@ -6,8 +6,10 @@
 #define TP_CONCURRENTE_RESTAURANTE_H
 
 #include <iostream>
+#include <unistd.h>
 #include <list>
 #include "Plato.h"
+#include "CorteLuz_Handler.h"
 
 class Restaurante {
 private:
@@ -15,6 +17,7 @@ private:
         cantMozos,
         cantMesas;
     std::list<Plato> listPlatos;
+    CorteLuz_Handler corteLuz_handler;
 
 public:
     Restaurante();
@@ -22,6 +25,8 @@ public:
     bool inicializar();
 
     void run();
+
+    void reset();
 
     ~Restaurante();
 };

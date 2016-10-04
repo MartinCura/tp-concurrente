@@ -16,6 +16,9 @@ void Restaurante::run() {
     std::cout << "...iniciando Restorrente..." << std::endl;
 }
 
-Restaurante::~Restaurante() {
+void Restaurante::reset() {
 
+}
+
+Restaurante::~Restaurante() {
 }

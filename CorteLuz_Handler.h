@@ -1,8 +1,9 @@
 #ifndef CORTELUZ_HANDLER_H_
 #define CORTELUZ_HANDLER_H_
 
-#include <signal>
+#include <signal.h>
 #include <assert.h>
+#include "EventHandler.h"
 
 class CorteLuz_Handler : public EventHandler {
 private:
@@ -21,7 +22,9 @@ public:
         return 0;
     }
 
-    bool
+    bool fueGenerado() {
+        return corteGenerado;
+    }
 };
 
 #endif /* CORTELUZ_HANDLER_H_ */
