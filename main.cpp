@@ -1,7 +1,9 @@
-#include <iostream>
-//#include <json/json.h>
+#include "Restaurante.h"
 
 int main() {
-    std::cout << "Hello, Restaurant!" << std::endl;
+    Restaurante restaurante;
+    if (!restaurante.inicializar())
+        return -1;
+    restaurante.run();
     return 0;
 }

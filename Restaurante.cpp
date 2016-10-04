@@ -3,3 +3,19 @@
 //
 
 #include "Restaurante.h"
+
+Restaurante::Restaurante() {
+
+}
+
+bool Restaurante::inicializar() {
+    return true;
+}
+
+void Restaurante::run() {
+    std::cout << "...iniciando Restorrente..." << std::endl;
+}
+
+Restaurante::~Restaurante() {
+
+}
