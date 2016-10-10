@@ -9,7 +9,10 @@
 #include <unistd.h>
 #include <list>
 #include "Plato.h"
-#include "CorteLuz_Handler.h"
+
+#include "ProcesoMozo.h"
+#include "ProcesoRecepcionista.h"
+#include <errno.h>
 
 class Restaurante {
 private:
@@ -17,7 +20,6 @@ private:
         cantMozos,
         cantMesas;
     std::list<Plato> listPlatos;
-    CorteLuz_Handler corteLuz_handler;
 
 public:
     Restaurante();
