@@ -13,11 +13,14 @@ bool Restaurante::inicializar() {
 }
 
 void Restaurante::run() {
+    std::vector<Proceso*> basurero;
     try {
         std::cout << "["<< getpid() <<" Rest]...iniciando Restorrente..." << std::endl;
         std::cout << "["<< getpid() <<" Rest] Esperando a que arranquen el Recepcionista y el Mozo..." << std::endl;
         Proceso* proc_recep = new ProcesoRecepcionista();
+        basurero.push_back(proc_recep);
         Proceso* proc_mozo = new ProcesoMozo();
+        basurero.push_back(proc_mozo);
 
         /* Arrancan los procesos */
         proc_recep->start();
@@ -42,6 +45,8 @@ void Restaurante::run() {
         std::cout << "["<< getpid() <<" Rest] ...cerrando Restorrente..." << std::endl;
     } catch (ProcesoTerminadoException &p) {
         std::cout << "["<< p.pid <<"] Terminado." << std::endl;
+        for (unsigned i = 0; i < basurero.size(); i++)
+            delete basurero[i];
     }
 }
 

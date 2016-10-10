@@ -13,6 +13,7 @@
 #include "ProcesoMozo.h"
 #include "ProcesoRecepcionista.h"
 #include <errno.h>
+#include <vector>
 
 class Restaurante {
 private:
