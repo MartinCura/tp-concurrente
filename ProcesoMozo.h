@@ -9,7 +9,6 @@
 #define TP_CONCURRENTE_PROCESOMOZO_H
 
 #include "Proceso.h"
-#include <iostream>
 
 class ProcesoMozo : public Proceso {
 private:
@@ -17,8 +16,6 @@ private:
 
 public:
     ProcesoMozo();
-
-    void start();
 
     ~ProcesoMozo();
 };

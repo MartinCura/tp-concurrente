@@ -17,8 +17,6 @@ private:
 public:
     ProcesoRecepcionista();
 
-    void start();
-
     ~ProcesoRecepcionista();
 };
 

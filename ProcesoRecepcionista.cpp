@@ -6,19 +6,8 @@
  */
 
 #include "ProcesoRecepcionista.h"
-#include <iostream>
 
 ProcesoRecepcionista::ProcesoRecepcionista() : Proceso() {
-}
-
-void ProcesoRecepcionista::start() {
-   pid_t id = fork();
-   if (id == 0) {
-        ejecutarMiTarea();
-        throw ProcesoTerminadoException(getpid());
-   } else {
-       pid = id;
-   }
 }
 
 int ProcesoRecepcionista::ejecutarMiTarea() {
@@ -26,8 +15,8 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
     while (!sigint_handler.getGracefulQuit()){
-        std::cout << "[" << getpid() << " Recp] Hola, soy un Recepcionista y voy a atender cada 2 segundos..." << std::endl;
-        sleep(2);
+        std::cout << "[" << getpid() << " Recp] Hola, soy un Recepcionista y voy a atender cada 3 segundos..." << std::endl;
+        sleep(3);
     }
     SignalHandler::getInstance()->destruir();
 

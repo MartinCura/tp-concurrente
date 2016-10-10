@@ -11,6 +11,16 @@ Proceso::Proceso() {
     pid = 0;
 }
 
+void Proceso::start() {
+    pid_t id = fork();
+    if (id == 0) {
+        ejecutarMiTarea();
+        throw ProcesoTerminadoException(getpid());
+    } else {
+        pid = id;
+    }
+}
+
 pid_t Proceso::getPID() {
     return pid;
 }

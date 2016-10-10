@@ -12,20 +12,28 @@
 
 #include "ProcesoMozo.h"
 #include "ProcesoRecepcionista.h"
+#include "ProcesoCocinero.h"
 #include <errno.h>
 #include <vector>
 
 class Restaurante {
 private:
-    int cantDeRecepcionistas,
+    int cantRecepcionistas,
         cantMozos,
         cantMesas;
     std::list<Plato> listPlatos;
 
+    std::vector<Proceso*> recepcionistas;
+    std::vector<Proceso*> mozos;
+    Proceso* cocinero;
+
+    void inicializarRecursos();
+    void eliminarRescursos();
+
 public:
     Restaurante();
 
-    bool inicializar();
+    bool inicializado();
 
     void run();
 

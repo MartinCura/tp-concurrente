@@ -10,16 +10,6 @@
 ProcesoMozo::ProcesoMozo() : Proceso() {
 }
 
-void ProcesoMozo::start() {
-   pid_t id = fork();
-   if (id == 0) {
-       ejecutarMiTarea();
-       throw ProcesoTerminadoException(getpid());
-   } else {
-       pid = id;
-   }
-}
-
 int ProcesoMozo::ejecutarMiTarea() {
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);

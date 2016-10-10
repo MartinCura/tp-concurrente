@@ -16,6 +16,8 @@
 #include "SignalHandler.h"
 #include "Exceptions.h"
 
+#include <iostream>
+
 class Proceso {
 protected:
     pid_t pid;
@@ -25,7 +27,7 @@ protected:
 public:
     Proceso();
 
-    virtual void start() = 0;
+    void start();
 
     int wait_();
 
