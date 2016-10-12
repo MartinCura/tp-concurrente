@@ -10,9 +10,9 @@
 #include <list>
 #include "Plato.h"
 
-#include "ProcesoMozo.h"
-#include "ProcesoRecepcionista.h"
-#include "ProcesoCocinero.h"
+#include "Procesos/ProcesoMozo.h"
+#include "Procesos/ProcesoRecepcionista.h"
+#include "Procesos/ProcesoCocinero.h"
 #include <errno.h>
 #include <vector>
 
@@ -25,10 +25,10 @@ private:
 
     std::vector<Proceso*> recepcionistas;
     std::vector<Proceso*> mozos;
-    Proceso* cocinero;
+    Proceso* cocinero;  // no genérico
 
     void inicializarRecursos();
-    void eliminarRescursos();
+    void eliminarRecursos();
 
 public:
     Restaurante();

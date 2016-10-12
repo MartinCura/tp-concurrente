@@ -9,4 +9,4 @@ include_directories(/usr/include/jsoncpp)
 #add_executable(tp_concurrente ${SOURCE_FILES} "main.cpp")
 
 file(GLOB SOURCES "*.h" "*.cpp")
-add_executable(tp_concurrente ${SOURCES})
+add_executable(tp_concurrente ${SOURCES} Pedido.cpp Pedido.h)

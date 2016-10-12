@@ -9,11 +9,11 @@
 #include <queue>
 #include <string>
 #include "Empleado.h"
-#include "Plato.h"
+#include "../Plato.h"
 
 class Cocinero: public Empleado {
 private:
-    std::queue<Plato> colaCocinar;
+    std::queue<Plato> colaCocinar; // TODO: Reemplazar por fifo
 
 public:
     void Cocinar();

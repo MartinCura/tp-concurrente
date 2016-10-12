@@ -9,10 +9,17 @@
 #define TP_CONCURRENTE_PROCESOCOCINERO_H
 
 #include "Proceso.h"
+#include "../Fifos/FifoLectura.h"
+#include "../Fifos/FifoEscritura.h"
 
 class ProcesoCocinero : public Proceso {
 private:
     int ejecutarMiTarea();
+
+    void cocinar(Pedido pedido);
+    void enviarPedidoAMozos(FifoEscritura fifo, Pedido pedido);
+
+    void loggear(std::string mensaje);
 
 public:
     ProcesoCocinero();

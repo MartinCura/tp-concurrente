@@ -12,17 +12,22 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include "SIGINT_Handler.h"
-#include "SignalHandler.h"
-#include "Exceptions.h"
+#include "../SIGINT_Handler.h"
+#include "../SignalHandler.h"
+#include "../Exceptions.h"
 
 #include <iostream>
+
+static const int BUFFSIZE = 400;//
+static const std::string ARCHIVO_FIFO_COCINAR  = "/tmp/fifo_cocinar";
+static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";
 
 class Proceso {
 protected:
     pid_t pid;
 
     virtual int ejecutarMiTarea() = 0;
+    void loggear(std::string mensaje);
 
 public:
     Proceso();
@@ -37,6 +42,7 @@ public:
 
     int kill_();
 
+    // TODO: Cuidado, puede que este método solo funciona para el proceso Restaurante? Usar getpid().
     pid_t getPID();
 
     ~Proceso();

@@ -16,12 +16,12 @@ void Restaurante::inicializarRecursos() {
 
 }
 
-void Restaurante::eliminarRescursos() {
+void Restaurante::eliminarRecursos() {
 
 }
 
 bool Restaurante::inicializado() {
-    return true;
+    return true;    // útil
 }
 
 void Restaurante::run() {
@@ -30,6 +30,7 @@ void Restaurante::run() {
         std::cout << "["<< getpid() <<" Rest]...iniciando Restorrente..." << std::endl;
         std::cout << "["<< getpid() <<" Rest] Esperando a que arranquen el Recepcionista y el Mozo..." << std::endl;
 
+        // TODO: Mover a inicializacion?
         /* Creamos los procesos para los recepcionistas */
         for (unsigned i = 0; i < cantRecepcionistas; i++) {
             Proceso* proc_recep = new ProcesoRecepcionista();
@@ -79,16 +80,19 @@ void Restaurante::run() {
             delete basurero[i];
 
         std::cout << "["<< getpid() <<" Rest] ... VAMO A IRNO ..." << std::endl;
-        std::cout << "["<< getpid() <<" Rest] ...cerrando Restorrente..." << std::endl;
+        std::cout << "["<< getpid() <<" Rest] ...cerrando Restorrente..." << std::endl; // Nombre hardcodeado ¬¬
+
     } catch (ProcesoTerminadoException &p) {
-        std::cout << "["<< p.pid <<"] Terminado." << std::endl;
+        // Limpieza en cada proceso hijo
         for (unsigned i = 0; i < basurero.size(); i++)
             delete basurero[i];
+        std::cout << "["<< p.pid <<"] Terminado." << std::endl;
     }
 }
 
 void Restaurante::reset() {
-
+    // Registrar comida entregada pero no pagada como pérdida
+    // Cocinero, mozos, recepcionista olvidan lo que estaban haciendo (se resetean)
 }
 
 Restaurante::~Restaurante() {

@@ -40,5 +40,9 @@ int Proceso::kill_() {
     return kill(pid, SIGKILL);
 }
 
+void Proceso::loggear(std::string mensaje) {
+    std::cout << "[" << getpid() << "] " << mensaje << std::endl;
+}
+
 Proceso::~Proceso() {
 }
