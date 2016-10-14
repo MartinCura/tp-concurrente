@@ -31,7 +31,7 @@ int ProcesoCocinero::ejecutarMiTarea() {
         sleep(3);
 
         // Bloquea si todavía no hay más pedidos para cocinar
-        ssize_t bytesLeidos = canal.leer( static_cast<void*>(buffer),BUFFSIZE );
+        ssize_t bytesLeidos = fifoACocinar.leer( static_cast<void*>(buffer),BUFFSIZE );
 
         std::string mensaje = buffer;
         mensaje.resize ( bytesLeidos );
@@ -43,7 +43,7 @@ int ProcesoCocinero::ejecutarMiTarea() {
 
     }
 
-    canal.cerrar();
+    fifoACocinar.cerrar();
 
     // Aca si no existía, se crea una nueva y se la elimina... TODO
     SignalHandler::getInstance()->destruir();
