@@ -5,7 +5,7 @@
  *      Author: emanuel
  */
 
-#include "ProcesoRecepcionista.h"
+#include "../../include/procesos/ProcesoRecepcionista.h"
 
 ProcesoRecepcionista::ProcesoRecepcionista() : Proceso() {
 }

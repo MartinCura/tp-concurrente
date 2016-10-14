@@ -9,7 +9,7 @@
 #include <queue>
 #include <string>
 #include "Empleado.h"
-#include "../Plato.h"
+#include "../modelo/Plato.h"
 
 class Cocinero: public Empleado {
 private:

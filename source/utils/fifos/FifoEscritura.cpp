@@ -1,4 +1,4 @@
-#include "FifoEscritura.h"
+#include "../../../include/utils/fifos/FifoEscritura.h"
 
 FifoEscritura::FifoEscritura(const std::string nombre) : Fifo(nombre) {
 }

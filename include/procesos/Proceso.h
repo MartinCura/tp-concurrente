@@ -12,9 +12,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include "../SIGINT_Handler.h"
-#include "../SignalHandler.h"
-#include "../Exceptions.h"
+#include "../handlers/SIGINT_Handler.h"
+#include "../handlers/SignalHandler.h"
+#include "../excepciones/Exceptions.h"
 
 #include <iostream>
 

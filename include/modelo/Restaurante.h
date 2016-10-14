@@ -10,9 +10,9 @@
 #include <list>
 #include "Plato.h"
 
-#include "Procesos/ProcesoMozo.h"
-#include "Procesos/ProcesoRecepcionista.h"
-#include "Procesos/ProcesoCocinero.h"
+#include "../procesos/ProcesoMozo.h"
+#include "../procesos/ProcesoRecepcionista.h"
+#include "../procesos/ProcesoCocinero.h"
 #include <errno.h>
 #include <vector>
 

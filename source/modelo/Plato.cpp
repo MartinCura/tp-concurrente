@@ -2,7 +2,7 @@
 // Created by martin on 27/09/16.
 //
 
-#include "Plato.h"
+#include "../../include/modelo/Plato.h"
 
 std::string Plato::get_nombre() {
     return this->nombre;

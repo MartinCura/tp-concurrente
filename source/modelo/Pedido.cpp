@@ -2,7 +2,7 @@
 // Created by martin on 11/10/16.
 //
 
-#include "Pedido.h"
+#include "../../include/modelo/Pedido.h"
 
 
 Pedido::Pedido() {
@@ -47,4 +47,3 @@ int Pedido::cantPlatos() {
     }
     return sum;
 }
-

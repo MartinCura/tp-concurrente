@@ -5,7 +5,7 @@
  *      Author: emanuel
  */
 
-#include "Proceso.h"
+#include "../../include/procesos/Proceso.h"
 
 Proceso::Proceso() {
     pid = 0;

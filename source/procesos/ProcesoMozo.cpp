@@ -5,7 +5,7 @@
  *      Author: emanuel
  */
 
-#include "ProcesoMozo.h"
+#include "../../include/procesos/ProcesoMozo.h"
 
 ProcesoMozo::ProcesoMozo() : Proceso() {
 }
@@ -34,7 +34,7 @@ int ProcesoMozo::ejecutarMiTarea() {
         // TODO: Cómo chequear cola sin bloquear? Semáforos? Locks?
 
         Pedido pedido;// Pedido de grupo de comensales
-        enviarPedidoACocinero( pedido.serializar() );
+        enviarPedidoACocinero( fifoACocinar, pedido );
     }
 
     // TODO: Verificar que se llega acá

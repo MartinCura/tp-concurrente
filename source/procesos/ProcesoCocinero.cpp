@@ -5,7 +5,7 @@
  *      Author: emanuel
  */
 
-#include "ProcesoCocinero.h"
+#include "../../include/procesos/ProcesoCocinero.h"
 
 ProcesoCocinero::ProcesoCocinero() : Proceso() {
 }
@@ -62,7 +62,7 @@ void ProcesoCocinero::enviarPedidoAMozos(FifoEscritura fifo, Pedido pedido) {
 void ProcesoCocinero::cocinar(Pedido pedido) {
     int cantDePlatos = pedido.cantPlatos();
     int tiempoPorPlato = 1;//TODO: hardcodeo
-    sleep( cantDePlatos * tiempoATardar );
+    sleep( cantDePlatos * tiempoPorPlato );
 }
 
 void ProcesoCocinero::loggear(std::string mensaje) {
