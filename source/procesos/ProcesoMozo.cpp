@@ -24,9 +24,9 @@ int ProcesoMozo::ejecutarMiTarea() {
     FifoLectura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
 
-
+    loggear("Hola, soy un Mozo y voy a atender cada 2 segundos...");
     while (!sigint_handler.getGracefulQuit()){
-        loggear("Hola, soy un Mozo y voy a atender cada 2 segundos...");
+        loggear("atendiendo...");
         sleep(2);
 
         // Recibir pedidos cocinados por cocinero

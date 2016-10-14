@@ -10,6 +10,8 @@
 #include <list>
 #include "Plato.h"
 
+#include "../utils/Constantes.h"
+#include "../procesos/ProcesoComensales.h"
 #include "../procesos/ProcesoMozo.h"
 #include "../procesos/ProcesoRecepcionista.h"
 #include "../procesos/ProcesoCocinero.h"
@@ -18,17 +20,30 @@
 
 class Restaurante {
 private:
+    bool running;
+    bool hay_luz;
     int cantRecepcionistas,
         cantMozos,
         cantMesas;
     std::list<Plato> listPlatos;
 
+    Proceso* generadorComensales;
     std::vector<Proceso*> recepcionistas;
     std::vector<Proceso*> mozos;
     Proceso* cocinero;  // no genérico
 
+    void lanzarProcesos();
+    void terminarProcesos();
+
     void inicializarRecursos();
     void eliminarRecursos();
+
+    void reset();
+
+    void procesarInput(std::string input);
+    void procesarCorteDeLuz();
+    void procesarVueltaDeLuz();
+    void consultarCaja();
 
 public:
     Restaurante();
@@ -36,8 +51,6 @@ public:
     bool inicializado();
 
     void run();
-
-    void reset();
 
     ~Restaurante();
 };

@@ -26,8 +26,9 @@ int ProcesoCocinero::ejecutarMiTarea() {
 
     char buffer[BUFFSIZE];
 
+    loggear("Hola, soy un Cocinero y voy a atender cada 3 segundos...");
     while (!sigint_handler.getGracefulQuit()) {
-        loggear("Hola, soy un Cocinero y voy a atender cada 3 segundos...");
+        loggear("cocinando...");
         sleep(3);
 
         // Bloquea si todavía no hay más pedidos para cocinar
