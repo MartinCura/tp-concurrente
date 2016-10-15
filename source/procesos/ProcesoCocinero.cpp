@@ -11,6 +11,13 @@ ProcesoCocinero::ProcesoCocinero() : Proceso() {
 }
 
 int ProcesoCocinero::ejecutarMiTarea() {
+
+    if (BUFFSIZE < Pedido::TAM_MENSAJE + 1) {
+        perror("BUFFSIZE muy chico");
+        exit(1);
+    }
+    char buffer[BUFFSIZE];
+
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
@@ -24,26 +31,27 @@ int ProcesoCocinero::ejecutarMiTarea() {
     FifoEscritura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
 
-    char buffer[BUFFSIZE];
-
     while (!sigint_handler.getGracefulQuit()) {
         loggear("Hola, soy un Cocinero y voy a atender cada 3 segundos...");
         sleep(3);
 
         // Bloquea si todavía no hay más pedidos para cocinar
-        ssize_t bytesLeidos = fifoACocinar.leer( static_cast<void*>(buffer),BUFFSIZE );
+        ssize_t bytesLeidos = fifoACocinar.leer( static_cast<void*>(buffer),Pedido::TAM_MENSAJE );
 
         std::string mensaje = buffer;
-        mensaje.resize ( bytesLeidos );
-        loggear("Recibí pedido: " + mensaje);
+        mensaje.resize ( (unsigned long) bytesLeidos );
+        //loggear("Recibí pedido: " + mensaje);
         Pedido pedidoACocinar = Pedido::deserializar(mensaje);
 
         cocinar(pedidoACocinar);
 
-
     }
 
     fifoACocinar.cerrar();
+    fifoACocinar.eliminar();
+
+    fifoCocinado.cerrar();
+    fifoCocinado.eliminar();
 
     // Aca si no existía, se crea una nueva y se la elimina... TODO
     SignalHandler::getInstance()->destruir();
@@ -53,7 +61,6 @@ int ProcesoCocinero::ejecutarMiTarea() {
 
 void ProcesoCocinero::enviarPedidoAMozos(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
-    // El chiste es que el mensaje siempre debería tener el mismo largo, no? TODO: Chequear
     fifo.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
     loggear("Envío a la cola cocinado: " + mensaje);//
 }
@@ -61,8 +68,10 @@ void ProcesoCocinero::enviarPedidoAMozos(FifoEscritura fifo, Pedido pedido) {
 // TODO
 void ProcesoCocinero::cocinar(Pedido pedido) {
     int cantDePlatos = pedido.cantPlatos();
-    int tiempoPorPlato = 1;//TODO: hardcodeo
-    sleep( cantDePlatos * tiempoPorPlato );
+    unsigned int tiempoPorPlato = 1;//TODO: hardcodeo
+    unsigned int tiempoCocinando = 0 + cantDePlatos * tiempoPorPlato;
+    loggear( "Cocinando pedido..." );
+    sleep( tiempoCocinando );
 }
 
 void ProcesoCocinero::loggear(std::string mensaje) {

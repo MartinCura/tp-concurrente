@@ -53,6 +53,8 @@ void Restaurante::run() {
         cocinero->start();
 
         sleep(5);
+
+        std::cout << "["<< getpid() <<" Rest] Enviando SIGINTs" << std::endl;
         /* Mandamos señales de interrupción (SIGINT) a los recepcionistas y
           esperamos a que terminen.
         */

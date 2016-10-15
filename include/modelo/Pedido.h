@@ -8,19 +8,21 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cmath>
 
 // interfaz Serializable
 class Pedido {
 public:
-    Pedido();
-    //void agregarPlato(int);
-    int cantPlatos();
+    Pedido(int numMesa);
+    void agregarPlato(int numPlato, int cant = 1);
+    unsigned int cantPlatos();
     std::string serializar();
     static Pedido deserializar(std::string str_serializado);
+    static int TAM_MENSAJE;
 
 private:
     // Algún identificador para saber a qué grupo de comensales pertenece
-    // TODO: Podría ser el pid_t? Ver dependiendo del IPC usado.
+    // TODO: Podría ser el pid_t? Ver dependiendo del IPC usado. Ser consistente con TAM_NUM_MESA
     int num_mesa;
     /* TODO
      * La idea es que cada posición del scorecard

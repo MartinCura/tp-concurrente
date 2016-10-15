@@ -1,3 +1,4 @@
+#include <iostream>
 #include "../../../include/utils/fifos/Fifo.h"
 
 Fifo::Fifo(const std::string nombre) : nombre(nombre), fd(-1) {
@@ -8,10 +9,12 @@ Fifo::~Fifo() {
 }
 
 void Fifo::cerrar() {
-	close ( fd );
+	if ( close ( fd ) < 0 )
+		std::cerr << "Close errno: " << errno << std::endl;
 	fd = -1;
 }
 
 void Fifo::eliminar() const {
-	unlink ( nombre.c_str() );
+	if ( unlink ( nombre.c_str() ) < 0 && errno != ENOENT )
+		std::cerr << "Unlink errno: " << errno << std::endl;
 }

@@ -26,20 +26,27 @@ int ProcesoMozo::ejecutarMiTarea() {
 
 
     while (!sigint_handler.getGracefulQuit()){
-        loggear("Hola, soy un Mozo y voy a atender cada 2 segundos...");
+        loggear("Hola, soy un Mozo y voy a atender cada 2 segundos...");//
         sleep(2);
 
         // Recibir pedidos cocinados por cocinero
             // Si hay, entregar a comensales correctos
         // TODO: Cómo chequear cola sin bloquear? Semáforos? Locks?
 
-        Pedido pedido;// Pedido de grupo de comensales
-        enviarPedidoACocinero( fifoACocinar, pedido );
+        try {
+            Pedido pedido(10);// Pedido de grupo de comensales TODO HARDCODE
+            enviarPedidoACocinero( fifoACocinar, pedido );
+
+        } catch (std::invalid_argument ex) {
+            loggear("ERROR Pasé un argumento inválido a creación de pedido");
+        }
     }
 
-    // TODO: Verificar que se llega acá
-    fifoACocinar.cerrar ();
-    //fifoACocinar.eliminar ();
+    fifoACocinar.cerrar();
+    fifoACocinar.eliminar();
+
+    fifoCocinado.cerrar();
+    fifoCocinado.eliminar();
 
     SignalHandler::getInstance()->destruir();
 
@@ -48,9 +55,8 @@ int ProcesoMozo::ejecutarMiTarea() {
 
 void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
-    // El chiste es que el mensaje siempre debería tener el mismo largo, no? TODO: Chequear
+    //loggear("mensaje: " + mensaje);
     fifo.escribir(static_cast<const void*>(mensaje.c_str()),mensaje.length() );
-    loggear("Envío a la cola cocinar: " + mensaje);//
 }
 
 void ProcesoMozo::loggear(std::string mensaje) {
