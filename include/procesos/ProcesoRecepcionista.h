@@ -14,8 +14,6 @@ class ProcesoRecepcionista : public Proceso {
 private:
     int ejecutarMiTarea();
 
-    void loggear(std::string mensaje);
-
 public:
     ProcesoRecepcionista();
 

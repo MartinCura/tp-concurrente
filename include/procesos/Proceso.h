@@ -15,7 +15,8 @@
 #include "../handlers/SIGINT_Handler.h"
 #include "../handlers/SignalHandler.h"
 #include "../excepciones/Exceptions.h"
-
+#include "../utils/Logger.h"
+#include "../utils/Constantes.h"
 #include <iostream>
 
 static const int BUFFSIZE = 400;//
@@ -28,7 +29,6 @@ protected:
     bool stopped;
 
     virtual int ejecutarMiTarea() = 0;
-    void loggear(std::string mensaje);
 
 public:
     Proceso();
@@ -44,8 +44,6 @@ public:
     int continue_();
 
     int interrupt_();
-
-    int kill_();
 
     // TODO: Cuidado, puede que este método solo funciona para el proceso Restaurante? Usar getpid().
     // Tranqui...la idea es que lo use sólo Restaurante.

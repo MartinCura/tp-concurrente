@@ -9,8 +9,6 @@ Restaurante::Restaurante() {
     hay_luz = true;
     cantRecepcionistas = 1;
     cantMozos = 2;
-    recepcionistas.clear();
-    mozos.clear();
 
     generadorComensales = new ProcesoComensales();
 
@@ -80,26 +78,22 @@ bool Restaurante::inicializado() {
 
 void Restaurante::run() {
     try {
-        std::cout << "["<< getpid() <<" Rest]...iniciando Restorrente..." << std::endl;
-        std::cout << "["<< getpid() <<" Rest] Esperando a que arranquen el Recepcionista y el Mozo..." << std::endl;
+        Logger::getInstance()->log("INFO", REST, getpid(), "Iniciando Restorrente...");
 
         lanzarProcesos();
 
-        std::string input;
-
         /* Manejamos los cortes y vueltas de luz y cierre del restaurante desde std::cin */
+        std::string input;
         while (running) {
+            std::cout << "Ingrese un comando >> ";
             std::cin >> input;
             procesarInput(input);
         }
 
-        sleep(1);
-
         terminarProcesos();
 
-        std::cout << "["<< getpid() <<" Rest] ... VAMO A IRNO ..." << std::endl;
-        std::cout << "["<< getpid() <<" Rest] ...cerrando Restorrente..." << std::endl; // Nombre hardcodeado ¬¬
-
+        Logger::getInstance()->log("INFO", REST, getpid(), "Cerrando Restorrente...");
+        Logger::getInstance()->destruir();
     } catch (ProcesoTerminadoException &p) {
         std::cout << "["<< p.pid <<"] Terminado." << std::endl;
     }
@@ -114,10 +108,18 @@ void Restaurante::procesarInput(std::string input) {
         procesarVueltaDeLuz();
     else if (input == CONSULTAR_CAJA)
         consultarCaja();
+    else if (input == HELP) {
+        std::cout << "Comandos:\n";
+        std::cout << "\tquit\t\tFinaliza Restorrente\n";
+        std::cout << "\tcorte\t\tGenera un corte de suministro de energía\n";
+        std::cout << "\tluz\t\tRetorna el suministro de energía\n";
+        std::cout << "\tcaja\t\tConsulta el estado de la caja\n";
+    } else std::cout << "Comando no encontrado. Ingrese \"help\" para obtener ayuda.\n";
 }
 
 void Restaurante::procesarCorteDeLuz() {
     if (hay_luz) {
+        Logger::getInstance()->log("INFO", REST, getpid(), "Se generó un corte de luz");
         /* TODO hay que "vaciar" todo (reiniciar) y parar los procesos (SIGSTOP???) hasta que vuelva la luz */
 
         /* Detenemos los procesos */
@@ -137,11 +139,12 @@ void Restaurante::procesarCorteDeLuz() {
 
 void Restaurante::procesarVueltaDeLuz() {
     if (!hay_luz) {
+        Logger::getInstance()->log("INFO", REST, getpid(), "Se reanudó el suministro de energía");
         /* TODO hay que reanudar los procesos pero en 0 (fifos vacíos y otras yerbas, etc) (SIGCONT???) */
 
         /* Reanudamos los procesos */
         generadorComensales->continue_();
-        
+
         for (unsigned i = 0; i < recepcionistas.size(); i++)
             recepcionistas[i]->continue_();
 
@@ -155,7 +158,7 @@ void Restaurante::procesarVueltaDeLuz() {
 }
 
 void Restaurante::consultarCaja() {
-    std::cout << "...consultando caja..." << std::endl;
+    Logger::getInstance()->log("INFO", RECP, getpid(), "Consulta de caja");
 }
 
 void Restaurante::reset() {

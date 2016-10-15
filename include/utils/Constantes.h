@@ -13,5 +13,12 @@
 #define CORTAR_LUZ      "corte"
 #define DEVOLVER_LUZ    "luz"
 #define CONSULTAR_CAJA  "caja"
+#define HELP            "help"
+
+#define MOZO    "MOZO"
+#define CHEF    "CHEF"
+#define RECP    "RECP"
+#define REST    "REST"
+#define GCOM    "GCOM"
 
 #endif //TP_CONCURRENTE_CONSTANTES_H

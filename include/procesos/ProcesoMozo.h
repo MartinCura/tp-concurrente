@@ -19,8 +19,6 @@ private:
 
     void enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido);
 
-    void loggear(std::string mensaje);
-
 public:
     ProcesoMozo();
 

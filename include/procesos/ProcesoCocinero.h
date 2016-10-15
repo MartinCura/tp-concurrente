@@ -20,8 +20,6 @@ private:
     void cocinar(Pedido pedido);
     void enviarPedidoAMozos(FifoEscritura fifo, Pedido pedido);
 
-    void loggear(std::string mensaje);
-
 public:
     ProcesoCocinero();
 

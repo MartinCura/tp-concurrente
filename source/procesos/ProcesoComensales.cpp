@@ -11,21 +11,20 @@ ProcesoComensales::ProcesoComensales() : Proceso() {
 }
 
 int ProcesoComensales::ejecutarMiTarea() {
+    Logger::getInstance()->log("INFO", GCOM, getpid(), "Iniciando Generador de comensales...");
+
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
-    loggear("Hola, soy un generador de grupo de comensales y voy a generar grupos cada 4 segundos");
+    Logger::getInstance()->log("INFO", GCOM, getpid(), "Hola, soy un generador de grupo de comensales y voy a generar grupos cada 4 segundos");
     while (!sigint_handler.getGracefulQuit()){
-        loggear("...generando grupo de comensales: 4 (hardcodeo)...");
+        Logger::getInstance()->log("INFO", GCOM, getpid(), "generando grupo de comensales: 4 (hardcodeo)...");
+
         sleep(4);
     }
     SignalHandler::getInstance()->destruir();
-
+    Logger::getInstance()->log("INFO", GCOM, getpid(), "Cerrando...");
     return 0;
-}
-
-void ProcesoComensales::loggear(std::string mensaje) {
-    std::cout << "[" << getpid() << " Comens] " << mensaje << std::endl;
 }
 
 ProcesoComensales::~ProcesoComensales() {
