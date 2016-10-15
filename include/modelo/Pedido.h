@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <cmath>
+#include <stdexcept>
 
 // TODO: Puedo hacer método impresionLegible que imprima solo los platos != 0 con nombre
 

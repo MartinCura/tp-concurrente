@@ -51,7 +51,7 @@ int ProcesoMozo::ejecutarMiTarea() {
     fifoCocinado.cerrar();
     fifoCocinado.eliminar();
 
-    SignalHandler::getInstance()->destruir();
+    SignalHandler::destruir();
     Logger::getInstance()->log("INFO", MOZO, getpid(), "Cerrando Mozo...");
     return 0;
 }

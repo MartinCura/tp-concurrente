@@ -23,7 +23,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
 
         sleep(3);
     }
-    SignalHandler::getInstance()->destruir();
+    SignalHandler::destruir();
     Logger::getInstance()->log("INFO", RECP, getpid(), "Cerrando...");
 
     return 0;

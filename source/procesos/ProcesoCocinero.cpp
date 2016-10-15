@@ -59,7 +59,7 @@ int ProcesoCocinero::ejecutarMiTarea() {
     Logger::getInstance()->log("INFO", CHEF, getpid(), "Cerrando Chef...");
 
     // Aca si no existía, se crea una nueva y se la elimina... TODO
-    SignalHandler::getInstance()->destruir();
+    SignalHandler::destruir();
 
     return 0;
 }

@@ -22,7 +22,7 @@ int ProcesoComensales::ejecutarMiTarea() {
 
         sleep(4);
     }
-    SignalHandler::getInstance()->destruir();
+    SignalHandler::destruir();
     Logger::getInstance()->log("INFO", GCOM, getpid(), "Cerrando...");
     return 0;
 }
