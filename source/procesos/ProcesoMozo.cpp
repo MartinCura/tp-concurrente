@@ -16,10 +16,24 @@ int ProcesoMozo::ejecutarMiTarea() {
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
+    std::cout << "espero a cocinero que abra fifo de lectura" << std::endl;//
+
     // Abro fifo de escritura para pedidos al cocinero
     // Se bloquea hasta que aparezca el cocinero
     FifoEscritura fifoACocinar ( ARCHIVO_FIFO_COCINAR );
     fifoACocinar.abrir();
+
+    std::cout << "fifoACocinar abierto escritura" << std::endl;//
+
+    //;//
+    std::ostringstream ss;
+    ss << getpid() << " abcdefghijklmnopqrstuvwxyzABCDEFGHIFJKLMNOPQRSTUVWXYZ" << std::endl;
+    std::string unMensajeAux = ss.str();
+    int length = unMensajeAux.length();
+    for (int i = 0; i < 1000; ++i) {
+        fifoACocinar.escribir(static_cast<const void*>(unMensajeAux.c_str()),length );
+    }
+    //;//
 
     // Abro fifo de escritura para pedidos ya cocinados y para entregar
     // Se bloquea hasta que aparezca el cocinero
@@ -59,7 +73,7 @@ int ProcesoMozo::ejecutarMiTarea() {
 void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
     //loggear("mensaje: " + mensaje);
-    fifo.escribir(static_cast<const void*>(mensaje.c_str()),mensaje.length() );
+    fifo.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
 }
 
 ProcesoMozo::~ProcesoMozo() {

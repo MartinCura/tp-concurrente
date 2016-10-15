@@ -21,10 +21,31 @@ int ProcesoCocinero::ejecutarMiTarea() {
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
+    sleep(3);//
+    std::cout << "Cocinero por abrir fifo cocinar" << std::endl;//
+
     // Abro fifo de lectura para pedidos al cocinero
     // Se bloquea si todavía no ha habido mozos
     FifoLectura fifoACocinar ( ARCHIVO_FIFO_COCINAR );
     fifoACocinar.abrir();
+
+    std::cout << "fifoACocinar abierto lectura" << std::endl;//
+
+    sleep(5);//
+
+    //;//
+    std::ostringstream ss;
+    ss << getpid() << " abcdefghijklmnopqrstuvwxyzABCDEFGHIFJKLMNOPQRSTUVWXYZ" << std::endl;
+    std::string unMensajeAux = ss.str();
+    int length = unMensajeAux.length();
+    std::cout << "Cocinero recibí:" << std::endl;//
+    for (int i = 1; i <= 2000; ++i) {
+        ssize_t bytesLeidos = fifoACocinar.leer( static_cast<void*>(buffer),length );
+        std::string mensaje = buffer;
+        mensaje.resize ( (unsigned long) bytesLeidos );
+        std::cout << i << " - " << mensaje;
+    }
+    //;//
 
     // Abro fifo de escritrua para pedidos ya cocinados
     // Se bloquea si todavía no ha habido mozos
