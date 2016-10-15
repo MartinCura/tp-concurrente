@@ -11,6 +11,8 @@ ProcesoMozo::ProcesoMozo() : Proceso() {
 }
 
 int ProcesoMozo::ejecutarMiTarea() {
+    Logger::getInstance()->log("INFO", MOZO, getpid(), "Iniciando Mozo...");
+
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
@@ -24,13 +26,14 @@ int ProcesoMozo::ejecutarMiTarea() {
     FifoLectura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
 
+    Logger::getInstance()->log("INFO", MOZO, getpid(), "Hola, soy un Mozo y voy a atender cada 2 segundos...");
 
     while (!sigint_handler.getGracefulQuit()){
-        loggear("Hola, soy un Mozo y voy a atender cada 2 segundos...");//
+        Logger::getInstance()->log("INFO", MOZO, getpid(), "atendiendo...");
         sleep(2);
 
         // Recibir pedidos cocinados por cocinero
-            // Si hay, entregar a comensales correctos
+        // Si hay, entregar a comensales correctos
         // TODO: Cómo chequear cola sin bloquear? Semáforos? Locks?
 
         try {
@@ -38,7 +41,7 @@ int ProcesoMozo::ejecutarMiTarea() {
             enviarPedidoACocinero( fifoACocinar, pedido );
 
         } catch (std::invalid_argument ex) {
-            loggear("ERROR Pasé un argumento inválido a creación de pedido");
+            Logger::getInstance()->log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
         }
     }
 
@@ -49,7 +52,7 @@ int ProcesoMozo::ejecutarMiTarea() {
     fifoCocinado.eliminar();
 
     SignalHandler::getInstance()->destruir();
-
+    Logger::getInstance()->log("INFO", MOZO, getpid(), "Cerrando Mozo...");
     return 0;
 }
 
@@ -57,10 +60,6 @@ void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
     //loggear("mensaje: " + mensaje);
     fifo.escribir(static_cast<const void*>(mensaje.c_str()),mensaje.length() );
-}
-
-void ProcesoMozo::loggear(std::string mensaje) {
-    std::cout << "[" << getpid() << " Mozo] " << mensaje << std::endl;
 }
 
 ProcesoMozo::~ProcesoMozo() {

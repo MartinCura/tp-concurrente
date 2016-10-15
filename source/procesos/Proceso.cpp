@@ -9,9 +9,15 @@
 
 Proceso::Proceso() {
     pid = 0;
+    stopped = true;
+}
+
+bool Proceso::isStopped() {
+    return stopped;
 }
 
 void Proceso::start() {
+    stopped = false;
     pid_t id = fork();
     if (id == 0) {
         ejecutarMiTarea();
@@ -30,18 +36,17 @@ int Proceso::wait_() {
 }
 
 int Proceso::stop_() {
+    stopped = true;
     return kill(pid, SIGSTOP);
 }
-int Proceso::sigint_() {
+
+int Proceso::continue_() {
+    stopped = false;
+    return kill(pid, SIGCONT);
+}
+
+int Proceso::interrupt_() {
     return kill(pid, SIGINT);
-}
-
-int Proceso::kill_() {
-    return kill(pid, SIGKILL);
-}
-
-void Proceso::loggear(std::string mensaje) {
-    std::cout << "[" << getpid() << "] " << mensaje << std::endl;
 }
 
 Proceso::~Proceso() {

@@ -15,7 +15,8 @@
 #include "../handlers/SIGINT_Handler.h"
 #include "../handlers/SignalHandler.h"
 #include "../excepciones/Exceptions.h"
-
+#include "../utils/Logger.h"
+#include "../utils/Constantes.h"
 #include <iostream>
 
 static const int BUFFSIZE = 400;//
@@ -25,12 +26,14 @@ static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";
 class Proceso {
 protected:
     pid_t pid;
+    bool stopped;
 
     virtual int ejecutarMiTarea() = 0;
-    void loggear(std::string mensaje);
 
 public:
     Proceso();
+
+    bool isStopped();
 
     void start();
 
@@ -38,11 +41,12 @@ public:
 
     int stop_();
 
-    int sigint_();
+    int continue_();
 
-    int kill_();
+    int interrupt_();
 
     // TODO: Cuidado, puede que este método solo funciona para el proceso Restaurante? Usar getpid().
+    // Tranqui...la idea es que lo use sólo Restaurante.
     pid_t getPID();
 
     ~Proceso();

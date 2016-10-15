@@ -10,6 +10,8 @@
 #include <string>
 #include <cmath>
 
+// TODO: Puedo hacer método impresionLegible que imprima solo los platos != 0 con nombre
+
 // interfaz Serializable
 class Pedido {
 public:

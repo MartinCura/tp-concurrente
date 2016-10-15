@@ -31,8 +31,11 @@ int ProcesoCocinero::ejecutarMiTarea() {
     FifoEscritura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
 
+    Logger::getInstance()->log("INFO", CHEF, getpid(), "Hola, soy un Cocinero y voy a atender cada 3 segundos...");
+
     while (!sigint_handler.getGracefulQuit()) {
-        loggear("Hola, soy un Cocinero y voy a atender cada 3 segundos...");
+        Logger::getInstance()->log("INFO", CHEF, getpid(), "cocinando...");
+
         sleep(3);
 
         // Bloquea si todavía no hay más pedidos para cocinar
@@ -40,7 +43,7 @@ int ProcesoCocinero::ejecutarMiTarea() {
 
         std::string mensaje = buffer;
         mensaje.resize ( (unsigned long) bytesLeidos );
-        //loggear("Recibí pedido: " + mensaje);
+        //Logger::getInstance()->log("INFO", CHEF, getpid(), "Recibí pedido: " + mensaje);
         Pedido pedidoACocinar = Pedido::deserializar(mensaje);
 
         cocinar(pedidoACocinar);
@@ -53,6 +56,8 @@ int ProcesoCocinero::ejecutarMiTarea() {
     fifoCocinado.cerrar();
     fifoCocinado.eliminar();
 
+    Logger::getInstance()->log("INFO", CHEF, getpid(), "Cerrando Chef...");
+
     // Aca si no existía, se crea una nueva y se la elimina... TODO
     SignalHandler::getInstance()->destruir();
 
@@ -62,7 +67,7 @@ int ProcesoCocinero::ejecutarMiTarea() {
 void ProcesoCocinero::enviarPedidoAMozos(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
     fifo.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
-    loggear("Envío a la cola cocinado: " + mensaje);//
+    Logger::getInstance()->log("INFO", CHEF, getpid(), "Envío a la cola cocinado: " + mensaje);//
 }
 
 // TODO
@@ -70,12 +75,8 @@ void ProcesoCocinero::cocinar(Pedido pedido) {
     int cantDePlatos = pedido.cantPlatos();
     unsigned int tiempoPorPlato = 1;//TODO: hardcodeo
     unsigned int tiempoCocinando = 0 + cantDePlatos * tiempoPorPlato;
-    loggear( "Cocinando pedido..." );
+    Logger::getInstance()->log("INFO", CHEF, getpid(), "Cocinando pedido..." );
     sleep( tiempoCocinando );
-}
-
-void ProcesoCocinero::loggear(std::string mensaje) {
-    std::cout << "[" << getpid() << " Coci] " << mensaje << std::endl;
 }
 
 ProcesoCocinero::~ProcesoCocinero() {
