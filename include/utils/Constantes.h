@@ -14,4 +14,6 @@
 #define DEVOLVER_LUZ    "luz"
 #define CONSULTAR_CAJA  "caja"
 
+
+
 #endif //TP_CONCURRENTE_CONSTANTES_H

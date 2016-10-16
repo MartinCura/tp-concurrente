@@ -15,13 +15,14 @@ public:
     Pedido();
     //void agregarPlato(int);
     int cantPlatos();
+    int num_mesa;
     std::string serializar();
     static Pedido deserializar(std::string str_serializado);
 
 private:
     // Algún identificador para saber a qué grupo de comensales pertenece
     // TODO: Podría ser el pid_t? Ver dependiendo del IPC usado.
-    int num_mesa;
+
     /* TODO
      * La idea es que cada posición del scorecard
      * indique la cantidad de cada plato posible

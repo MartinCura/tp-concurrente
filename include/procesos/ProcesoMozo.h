@@ -16,8 +16,10 @@
 class ProcesoMozo : public Proceso {
 private:
     int ejecutarMiTarea();
-
-    void enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido);
+    void enviarPedidoACocinero(Pedido pedido);
+    void tomarPedidosComensales();
+    void cobrarAComensales();
+    void entregarPedidosAComensales();
 
     void loggear(std::string mensaje);
 

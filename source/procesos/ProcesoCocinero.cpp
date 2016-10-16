@@ -13,6 +13,7 @@ ProcesoCocinero::ProcesoCocinero() : Proceso() {
 int ProcesoCocinero::ejecutarMiTarea() {
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
+    loggear("Cocinero iniciado");
 
     // Abro fifo de lectura para pedidos al cocinero
     // Se bloquea si todavía no ha habido mozos
@@ -40,8 +41,6 @@ int ProcesoCocinero::ejecutarMiTarea() {
         Pedido pedidoACocinar = Pedido::deserializar(mensaje);
 
         cocinar(pedidoACocinar);
-
-
     }
 
     fifoACocinar.cerrar();

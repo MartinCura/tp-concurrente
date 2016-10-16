@@ -21,6 +21,9 @@
 static const int BUFFSIZE = 400;//
 static const std::string ARCHIVO_FIFO_COCINAR  = "/tmp/fifo_cocinar";
 static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";
+static const std::string ARCHIVO_FIFO_NUEVOS_PEDIDOS_COMENSALES  = "/tmp/fifo_nue_ped_come";
+static const std::string ARCHIVO_FIFO_NUEVOS_PEDIDOS_COBROS_COMENSALES  = "/tmp/fifo_nue_ped_cobros_com";
+
 
 class Proceso {
 protected:
