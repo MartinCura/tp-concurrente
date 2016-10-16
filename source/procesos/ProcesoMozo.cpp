@@ -6,6 +6,7 @@
  */
 
 #include "../../include/procesos/ProcesoMozo.h"
+#include "../../include/modelo/Restaurante.h"
 
 ProcesoMozo::ProcesoMozo() : Proceso() {
 }
@@ -36,6 +37,8 @@ int ProcesoMozo::ejecutarMiTarea() {
     Logger::getInstance()->log("INFO", MOZO, getpid(), "Hola, soy un Mozo y voy a atender cada 2 segundos...");
 
     recibirNuevoPedido(fifoACocinar);//
+    Restaurante::agregarGanancia(100);// TEST
+    Restaurante::agregarPerdida(7);// TEST
 
     while (!sigint_handler.getGracefulQuit()){
         Logger::getInstance()->log("INFO", MOZO, getpid(), "atendiendo...");

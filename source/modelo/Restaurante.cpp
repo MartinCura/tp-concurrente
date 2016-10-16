@@ -10,6 +10,8 @@ Restaurante::Restaurante() {
     cantRecepcionistas = 1;
     cantMozos = 2;
 
+    iniciarCaja();
+
     generadorComensales = new ProcesoComensales();
 
     /* Creamos los procesos para los recepcionistas */
@@ -159,9 +161,59 @@ void Restaurante::procesarVueltaDeLuz() {
     }
 }
 
-void Restaurante::consultarCaja() {
-    Logger::getInstance()->log("INFO", RECP, getpid(), "Consulta de caja");
+void Restaurante::iniciarCaja() {
+    try {
+        shmCaja = MemoriaCompartida<Caja>( ARCHIVO_SHM_CAJA,'A' );
+
+        struct Caja laCaja = Caja();
+        shmCaja.escribir( laCaja );
+
+    } catch ( std::string& mensaje ) {
+        std::cerr << mensaje << std::endl;
+    }
 }
+
+void Restaurante::consultarCaja() {
+    struct Caja laCaja = shmCaja.leer();
+    Logger::getInstance()->log("INFO", REST, getpid(), "---- Consulta de caja ----");
+    Logger::getInstance()->log("INFO", REST, getpid(), "- Ingresado\t Perdido -");
+    Logger::getInstance()->log("INFO", REST, getpid(),
+                               "- " + std::to_string(laCaja.ingreso) + "\t\t " + std::to_string(laCaja.perdido) + "\t -");
+    Logger::getInstance()->log("INFO", REST, getpid(), "--------------------------");
+}
+
+void Restaurante::agregarGanancia(int cant) {
+    if (cant < 0)
+        throw std::invalid_argument( "cant no puede ser negativa" );
+
+    try {
+        MemoriaCompartida<Caja> shmUnaCaja( ARCHIVO_SHM_CAJA,'A' );
+        // TODO Agregar lock? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        struct Caja laCaja = shmUnaCaja.leer();
+        laCaja.ingreso += cant;
+        shmUnaCaja.escribir(laCaja);
+
+    } catch ( std::string& mensaje ) {
+        std::cerr << mensaje << std::endl;
+    }
+}
+
+void Restaurante::agregarPerdida(int cant) {
+    if (cant < 0)
+        throw std::invalid_argument( "cant no puede ser negativa" );
+
+    try {
+        MemoriaCompartida<Caja> shmUnaCaja( ARCHIVO_SHM_CAJA,'A' );
+        // TODO Agregar lock? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        struct Caja laCaja = shmUnaCaja.leer();
+        laCaja.perdido += cant;
+        shmUnaCaja.escribir(laCaja);
+
+    } catch ( std::string& mensaje ) {
+        std::cerr << mensaje << std::endl;
+    }
+}
+
 
 void Restaurante::reset() {
     // Registrar comida entregada pero no pagada como pérdida

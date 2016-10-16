@@ -19,7 +19,7 @@
 #include "../utils/Constantes.h"
 #include <iostream>
 
-static const int BUFFSIZE = 400;//
+static const int BUFFSIZE = 400;
 static const std::string ARCHIVO_FIFO_COCINAR  = "/tmp/fifo_cocinar";
 static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";
 

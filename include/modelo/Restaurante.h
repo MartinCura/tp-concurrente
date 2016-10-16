@@ -14,8 +14,16 @@
 #include "../procesos/ProcesoMozo.h"
 #include "../procesos/ProcesoRecepcionista.h"
 #include "../procesos/ProcesoCocinero.h"
+#include "../../source/utils/MemoriaCompartida.h"
 #include <errno.h>
 #include <vector>
+
+static const std::string ARCHIVO_SHM_CAJA = "tp_concurrente";
+
+struct Caja {
+    int ingreso = 0;
+    int perdido = 0;
+};
 
 class Restaurante {
 private:
@@ -30,6 +38,10 @@ private:
     std::vector<Proceso*> recepcionistas;
     std::vector<Proceso*> mozos;
     Proceso* cocinero;  // no genérico
+
+    MemoriaCompartida<Caja> shmCaja;
+
+    void iniciarCaja();
 
     void lanzarProcesos();
     void terminarProcesos();
@@ -50,6 +62,9 @@ public:
     bool inicializado();
 
     void run();
+
+    static void agregarGanancia(int cant);
+    static void agregarPerdida(int cant);
 
     ~Restaurante();
 };
