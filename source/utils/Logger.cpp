@@ -17,8 +17,7 @@ void Logger::log(std::string tipo, std::string entidad, int pid, std::string out
     timeinfo = localtime(&rawtime);
     strftime(buffer,80,"%Y-%m-%d %I:%M:%S",timeinfo);
     std::string timestamp(buffer);
-    std::string pid_s = int_to_string(pid);
     logfile.open(LOGFILE, std::ofstream::app);
-    logfile << "[" << timestamp << "]" << '\t' << tipo << '\t' << pid_s << '\t' << entidad << '\t' << output << '\n';
+    logfile << "[" << timestamp << "]" << '\t' << tipo << '\t' << std::to_string(pid) << '\t' << entidad << '\t' << output << '\n';
     logfile.close();
 }

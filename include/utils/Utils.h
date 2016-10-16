@@ -8,18 +8,8 @@
 #ifndef TP_CONCURRENTE_UTILS_H
 #define TP_CONCURRENTE_UTILS_H
 
-#include <string>
-#include <sstream>
 #include <stdlib.h>
 #include <time.h>
-
-static std::string int_to_string(int number) {
-    std::string result;
-    std::ostringstream convert;
-    convert << number;
-    result = convert.str();
-    return result;
-}
 
 static int generarRandom(int tope) {
     srand((unsigned int) time(0));

@@ -35,8 +35,8 @@ int ProcesoMozo::ejecutarMiTarea() {
     fifoCocinado.setBlocking(false);
 
     recibirNuevoPedido(fifoACocinar);//
-    //Restaurante::agregarGanancia(100);// TEST
-    //Restaurante::agregarPerdida(7);// TEST
+    Restaurante::agregarGanancia(100);// TEST
+    Restaurante::agregarPerdida(7);// TEST
 
     while (!sigint_handler.getGracefulQuit()){
         Logger::log("INFO", MOZO, getpid(), "Mozo atendiendo...");

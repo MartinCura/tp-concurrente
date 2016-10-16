@@ -29,9 +29,10 @@ int ProcesoComensales::ejecutarMiTarea() {
         //dormir(tiempoEspera); /* TODO Es un "slepp" sin sleep asi que vale */
         /* Cantidad de comensales en el grupo que llegó */
         int cantComensales = generarRandom(MAX_COMENSALES_EN_GRUPO);
-        std::string num_s = int_to_string(cantComensales);
+        std::string num_s = std::to_string(cantComensales);
 
         Logger::log("INFO", GCOM, getpid(), "Llegó un grupo de comensales de " + num_s);
+        Logger::log("INFO", GCOM, getpid(), "Grupo de comensales de " + num_s + " esperando en la entrada para ser atendidos");
         semaforoRec.p();
         fifoLlegadaCom.escribir(static_cast<const void*>(num_s.c_str()), num_s.length());
     }

@@ -7,16 +7,20 @@
 Restaurante::Restaurante() {
     running = true;
     hay_luz = true;
+
     cantRecepcionistas = 2;
     cantMozos = 2;
+    cantMesas = 3;
 
-    //iniciarCaja();
+    iniciarCaja();
+
+    inicializarMesas();
 
     generadorComensales = new ProcesoComensales();
 
     /* Creamos los procesos para los recepcionistas */
     for (unsigned i = 0; i < cantRecepcionistas; i++)
-        recepcionistas.push_back(new ProcesoRecepcionista());
+        recepcionistas.push_back(new ProcesoRecepcionista(cantMesas));
 
     /* Creamos los procesos para los mozos */
     for (unsigned i = 0; i < cantMozos; i++)
@@ -29,7 +33,6 @@ Restaurante::Restaurante() {
 }
 
 void Restaurante::inicializarRecursos() {
-    /* TODO capaz está al pedo (si vamos a usar semáforos, debería servir) */
     Semaforo sem1(FILENAME_SEM_COM_RECP, 0);
     semaforos.push_back(sem1);
 
@@ -45,7 +48,6 @@ void Restaurante::inicializarRecursos() {
 }
 
 void Restaurante::eliminarRecursos() {
-    /* TODO capaz está al pedo (si vamos a usar semáforos, debería servir) */
     for (unsigned i = 0; i < semaforos.size(); i++)
         semaforos[i].eliminar();
 }
@@ -196,6 +198,23 @@ void Restaurante::iniciarCaja() {
     }
 }
 
+void Restaurante::inicializarMesas() {
+    char letra = 'A';
+    for (unsigned i = 0; i < cantMesas; i++) {
+        try {
+            MemoriaCompartida<Mesa> memoria(ARCHIVO_SHM_MESA, letra);
+            struct Mesa mesa = Mesa();
+            mesa.id = ++i;
+            memoria.escribir(mesa);
+            mesas.push_back(memoria);
+            letra++;
+        } catch (std::string &mensaje) {
+            Logger::log("ERR", REST, getpid(), "No se pudo crear una mesa. " + mensaje);
+            continue;
+        }
+    }
+}
+
 void Restaurante::consultarCaja() {
     Logger::log("INFO", RECP, getpid(), "Consulta de caja");
 
@@ -259,4 +278,5 @@ Restaurante::~Restaurante() {
         delete cocinero;
 
     semaforos.clear();
+    mesas.clear();
 }

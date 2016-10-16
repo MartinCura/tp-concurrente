@@ -8,10 +8,8 @@
 #ifndef TP_CONCURRENTE_PROCESOCOCINERO_H
 #define TP_CONCURRENTE_PROCESOCOCINERO_H
 
-#include "../modelo/Pedido.h"
 #include "Proceso.h"
-#include "../utils/fifos/FifoLectura.h"
-#include "../utils/fifos/FifoEscritura.h"
+#include "../modelo/Pedido.h"
 
 class ProcesoCocinero : public Proceso {
 private:

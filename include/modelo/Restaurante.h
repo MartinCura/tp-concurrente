@@ -12,16 +12,6 @@
 #include "../procesos/ProcesoMozo.h"
 #include "../procesos/ProcesoRecepcionista.h"
 #include "../procesos/ProcesoCocinero.h"
-#include "../utils/MemoriaCompartida.h"
-#include <errno.h>
-#include <vector>
-
-static const std::string ARCHIVO_SHM_CAJA = "tp_concurrente";
-
-struct Caja {
-    int ingreso = 0;
-    int perdido = 0;
-};
 
 class Restaurante {
 private:
@@ -40,8 +30,10 @@ private:
     std::vector<Semaforo> semaforos;
 
     MemoriaCompartida<Caja> shmCaja;
+    std::vector<MemoriaCompartida<Mesa>> mesas;
 
     void iniciarCaja();
+    void inicializarMesas();
 
     void lanzarProcesos();
     void terminarProcesos();

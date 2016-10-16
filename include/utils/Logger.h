@@ -10,7 +10,6 @@
 
 #include <fstream>
 #include <time.h>
-#include "Utils.h"
 
 static const std::string LOGFILE = "restorrente.log";
 

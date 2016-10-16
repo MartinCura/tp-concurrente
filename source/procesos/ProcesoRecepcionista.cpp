@@ -7,10 +7,32 @@
 
 #include "../../include/procesos/ProcesoRecepcionista.h"
 
-ProcesoRecepcionista::ProcesoRecepcionista() : Proceso() {
+ProcesoRecepcionista::ProcesoRecepcionista(int cant_mesas) : Proceso() {
+    cantidadMesas = cant_mesas;
+}
+
+void ProcesoRecepcionista::inicializarMesasCompartidas() {
+    char letra = 'A';
+    for (unsigned i = 0; i < cantidadMesas; i++) {
+        try {
+            MemoriaCompartida<Mesa> mesa(ARCHIVO_SHM_MESA, letra);
+            mesas.push_back(mesa);
+            letra++;
+        } catch (std::string &mensaje) {
+            Logger::log("ERR", RECP, getpid(), "No se pudo crear la mesa con id " + std::to_string(i+1) + ". " + mensaje);
+            continue;
+        }
+    }
+}
+
+void ProcesoRecepcionista::destruirMesasCompartidas() {
+    for (unsigned i = 0; i < mesas.size(); i++)
+        mesas[i].liberar();
 }
 
 int ProcesoRecepcionista::ejecutarMiTarea() {
+    inicializarMesasCompartidas();
+
     Logger::log("INFO", RECP, getpid(), "Recepcionista esperando para atender...");
 
     Semaforo semaforoCom = _semaforos[SEMAFORO_COM_RECP-1];
@@ -21,7 +43,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
 
     FifoLectura fifoLlegadaCom(ARCHIVO_FIFO_LLEGADA_COM);
     fifoLlegadaCom.abrir();
-    
+
     char buffer[BUFFSIZE];
     while (!sigint_handler.getGracefulQuit()){
         // Bloquea si todavía no hay más pedidos para cocinar
@@ -31,12 +53,11 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
             mensaje.resize ( (unsigned long) bytesLeidos );
             Logger::log("INFO", RECP, getpid(), "Atendiendo a un grupo de " + mensaje + ".");
         }
-        //sleep(2);
         semaforoRec.v();
     }
     SignalHandler::destruir();
     Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
-
+    destruirMesasCompartidas();
     fifoLlegadaCom.cerrar();
 
     return 0;

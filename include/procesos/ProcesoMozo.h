@@ -9,8 +9,6 @@
 #define TP_CONCURRENTE_PROCESOMOZO_H
 
 #include "Proceso.h"
-#include "../utils/fifos/FifoEscritura.h"
-#include "../utils/fifos/FifoLectura.h"
 #include "../modelo/Pedido.h"
 
 class ProcesoMozo : public Proceso {
