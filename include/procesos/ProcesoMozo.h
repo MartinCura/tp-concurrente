@@ -27,6 +27,7 @@ private:
     void enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido);
     void recibirPedidosListos(FifoLectura fifo);
     void entregarPedido(Pedido pedido);
+    void contabilizarPedido(Pedido pedido);
 
 public:
     ProcesoMozo();
