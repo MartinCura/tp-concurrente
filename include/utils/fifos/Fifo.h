@@ -12,6 +12,7 @@ public:
 	Fifo(const std::string nombre);
 	virtual ~Fifo();
 	virtual void abrir() = 0;
+	int getfd();
 	void setBlocking(bool);
 	void cerrar();
 	void eliminar() const;

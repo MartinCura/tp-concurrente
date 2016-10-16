@@ -5,6 +5,7 @@
  *      Author: emanuel
  */
 
+#include <poll.h>
 #include "../../include/procesos/ProcesoMozo.h"
 #include "../../include/modelo/Restaurante.h"
 
@@ -31,8 +32,8 @@ int ProcesoMozo::ejecutarMiTarea() {
     // Se bloquea hasta que aparezca el cocinero
     FifoLectura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
-    // Marco como non-blocking para que no retenga la atención del mozo cuando no hay cosas esperando
-    fifoCocinado.setBlocking(false);
+    //// Marco como non-blocking para que no retenga la atención del mozo cuando no hay cosas esperando
+    //fifoCocinado.setBlocking(false);
 
     Logger::getInstance()->log("INFO", MOZO, getpid(), "Hola, soy un Mozo y voy a atender cada 2 segundos...");
 
@@ -44,10 +45,17 @@ int ProcesoMozo::ejecutarMiTarea() {
         Logger::getInstance()->log("INFO", MOZO, getpid(), "atendiendo...");
         sleep(2);
 
-        // TODO Revisar forma de hacerlo no bloqueante
-        recibirPedidosListos( fifoCocinado );
-
-        // recibirNuevoPedido(); cuando no esté hardcodeado TODO
+        AccionMozo accion = esperarAccion(fifoCocinado);
+        switch (accion) {
+            case ENTREGAR_PEDIDO:
+                recibirPedidosListos( fifoCocinado );
+                break;
+            case TOMAR_PEDIDO:
+                // recibirNuevoPedido(); cuando no esté hardcodeado TODO
+                break;
+            default:
+                ;
+        }
     }
 
     fifoACocinar.cerrar();
@@ -59,6 +67,27 @@ int ProcesoMozo::ejecutarMiTarea() {
     SignalHandler::destruir();
     Logger::getInstance()->log("INFO", MOZO, getpid(), "Cerrando Mozo...");
     return 0;
+}
+
+AccionMozo ProcesoMozo::esperarAccion(FifoLectura fifoCocinado) {
+    struct pollfd fds[] = {
+            { fifoCocinado.getfd(), POLLIN }
+            // Agregar otros que se esperen TODO
+    };
+    nfds_t tamFds = 1; // Actualizar si se agrega TODO
+
+    int r = poll(fds, tamFds, 1000);//-1); // TODO Poner un timeout para que salgo o que quede esperando?
+
+    if (r < 0 && errno != EINTR)
+        perror( "poll()" );
+    else {
+        if (fds[0].revents & POLLIN)
+            return ENTREGAR_PEDIDO;
+        //if (fds[1].revents & POLLIN)
+        //    return TOMAR_PEDIDO;
+        // Estar listo para otros TODO
+    }
+    return NADA;
 }
 
 void ProcesoMozo::recibirNuevoPedido(FifoEscritura fifo) {

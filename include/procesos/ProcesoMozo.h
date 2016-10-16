@@ -13,10 +13,17 @@
 #include "../utils/fifos/FifoLectura.h"
 #include "../modelo/Pedido.h"
 
+enum AccionMozo {
+    NADA,
+    TOMAR_PEDIDO,
+    ENTREGAR_PEDIDO
+};
+
 class ProcesoMozo : public Proceso {
 private:
     int ejecutarMiTarea();
 
+    AccionMozo esperarAccion(FifoLectura fifoCocinado);
     void recibirNuevoPedido(FifoEscritura fifo);
     void enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido);
     void recibirPedidosListos(FifoLectura fifo);
