@@ -38,6 +38,7 @@ int ProcesoCocinero::ejecutarMiTarea() {
         // Bloquea si todavía no hay más pedidos para cocinar
         ssize_t bytesLeidos = fifoACocinar.leer( static_cast<void*>(buffer),Pedido::TAM_MENSAJE );
         if (bytesLeidos > 0) {
+            Logger::log("INFO", CHEF, getpid(), "Recibiendo un nuevo pedido.");
             std::string mensaje = buffer;
             mensaje.resize((unsigned long) bytesLeidos);
             Pedido pedido = Pedido::deserializar(mensaje);
@@ -63,7 +64,7 @@ int ProcesoCocinero::ejecutarMiTarea() {
 void ProcesoCocinero::enviarPedidoAMozos(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
     fifo.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
-    //Logger::log("INFO", CHEF, getpid(), "Envío a la cola cocinado: " + mensaje);
+    Logger::log("INFO", CHEF, getpid(), "Envío a la cola cocinado.");
 }
 
 // TODO

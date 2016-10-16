@@ -39,7 +39,6 @@ int ProcesoMozo::ejecutarMiTarea() {
     Restaurante::agregarPerdida(7);// TEST
 
     while (!sigint_handler.getGracefulQuit()){
-        Logger::log("INFO", MOZO, getpid(), "Mozo atendiendo...");
         sleep(2);
 
         // TODO Revisar forma de hacerlo no bloqueante
@@ -62,8 +61,8 @@ int ProcesoMozo::ejecutarMiTarea() {
 void ProcesoMozo::recibirNuevoPedido(FifoEscritura fifo) {
     try {
         Pedido pedido(10);// Pedido de grupo de comensales TODO HARDCODE
+        Logger::log("INFO", MOZO, getpid(), "Mozo tomando pedido.");
         enviarPedidoACocinero( fifo, pedido );
-
     } catch (std::invalid_argument ex) {
         Logger::log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
     }
@@ -71,8 +70,8 @@ void ProcesoMozo::recibirNuevoPedido(FifoEscritura fifo) {
 
 void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
-    //loggear("mensaje: " + mensaje);
     fifo.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
+    Logger::log("INFO", MOZO, getpid(), "Mozo entregando pedido a Cocinero.");
 }
 
 void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
@@ -84,10 +83,11 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
     if (bytesLeidos > 0) {
         std::string mensajeDePedido = buffer;
         mensajeDePedido.resize( (unsigned long) bytesLeidos );
-        //Logger::log("INFO", MOZO, getpid(), "Entrego pedido: " + mensajeDePedido);
+
         Pedido pedidoAEntregar = Pedido::deserializar(mensajeDePedido);
 
         entregarPedido(pedidoAEntregar);
+        Logger::log("INFO", MOZO, getpid(), "Entregó pedido.");
     }
 }
 
