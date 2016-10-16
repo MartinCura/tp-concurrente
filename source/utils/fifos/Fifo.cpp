@@ -8,6 +8,10 @@ Fifo::Fifo(const std::string nombre) : nombre(nombre), fd(-1) {
 Fifo::~Fifo() {
 }
 
+int Fifo::getfd() {
+    return this->fd;
+}
+
 void Fifo::setBlocking(bool bloqueante) {
 	int opts = fcntl( this->fd,F_GETFL,0 );
 	if (opts < 0) {
