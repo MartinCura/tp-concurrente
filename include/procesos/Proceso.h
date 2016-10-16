@@ -11,27 +11,30 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include "../handlers/SIGINT_Handler.h"
 #include "../handlers/SignalHandler.h"
 #include "../excepciones/Exceptions.h"
 #include "../utils/Logger.h"
+#include "../utils/Semaforo.h"
 #include "../utils/Constantes.h"
-#include <iostream>
+#include "../utils/fifos/FifoLectura.h"
+#include "../utils/fifos/FifoEscritura.h"
+#include <vector>
 
 static const int BUFFSIZE = 400;
-static const std::string ARCHIVO_FIFO_COCINAR  = "/tmp/fifo_cocinar";
-static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";
 
 class Proceso {
 protected:
     pid_t pid;
     bool stopped;
+    std::vector<Semaforo> _semaforos;
 
     virtual int ejecutarMiTarea() = 0;
 
 public:
     Proceso();
+
+    void addSemaphore(int id, Semaforo& sem);
 
     bool isStopped();
 

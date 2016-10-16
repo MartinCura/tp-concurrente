@@ -21,4 +21,16 @@
 #define REST    "REST"
 #define GCOM    "GCOM"
 
+static const int MAX_COMENSALES_EN_GRUPO = 5;
+
+static const std::string ARCHIVO_FIFO_COCINAR  = "/tmp/fifo_cocinar";
+static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";
+static const std::string ARCHIVO_FIFO_LLEGADA_COM  = "/tmp/fifo_llegada_com";
+
+static const std::string FILENAME_SEM_COM_RECP = "../procesos/ProcesoComensales.cpp";
+static const std::string FILENAME_SEM_RECP_COM = "../procesos/ProcesoRecepcionista.cpp";
+
+static const int SEMAFORO_COM_RECP = 1;
+static const int SEMAFORO_RECP_COM = 2;
+
 #endif //TP_CONCURRENTE_CONSTANTES_H

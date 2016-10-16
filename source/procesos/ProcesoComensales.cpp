@@ -11,19 +11,37 @@ ProcesoComensales::ProcesoComensales() : Proceso() {
 }
 
 int ProcesoComensales::ejecutarMiTarea() {
-    Logger::getInstance()->log("INFO", GCOM, getpid(), "Iniciando Generador de comensales...");
+    Logger::log("INFO", GCOM, getpid(), "Iniciando Generador de comensales...");
+
+    Semaforo semaforoCom = _semaforos[SEMAFORO_COM_RECP-1];
+    Semaforo semaforoRec = _semaforos[SEMAFORO_RECP_COM-1];
 
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
-    Logger::getInstance()->log("INFO", GCOM, getpid(), "Hola, soy un generador de grupo de comensales y voy a generar grupos cada 4 segundos");
-    while (!sigint_handler.getGracefulQuit()){
-        Logger::getInstance()->log("INFO", GCOM, getpid(), "generando grupo de comensales: 4 (hardcodeo)...");
+    FifoEscritura fifoLlegadaCom ( ARCHIVO_FIFO_LLEGADA_COM );
+    fifoLlegadaCom.abrir();
 
-        sleep(4);
+    while (!sigint_handler.getGracefulQuit()){
+        /* Tiempo que transcurre hasta que llegue el próximo grupo */
+        int tiempoEspera = generarRandom(10);
+        sleep(tiempoEspera);
+        //dormir(tiempoEspera); /* TODO Es un "slepp" sin sleep asi que vale */
+        /* Cantidad de comensales en el grupo que llegó */
+        int cantComensales = generarRandom(MAX_COMENSALES_EN_GRUPO);
+        std::string num_s = std::to_string(cantComensales);
+
+        Logger::log("INFO", GCOM, getpid(), "Llegó un grupo de comensales de " + num_s);
+        Logger::log("INFO", GCOM, getpid(), "Grupo de comensales de " + num_s + " esperando en la entrada para ser atendidos");
+        semaforoRec.p();
+        fifoLlegadaCom.escribir(static_cast<const void*>(num_s.c_str()), num_s.length());
     }
     SignalHandler::destruir();
-    Logger::getInstance()->log("INFO", GCOM, getpid(), "Cerrando...");
+
+    fifoLlegadaCom.cerrar();
+    fifoLlegadaCom.eliminar();
+
+    Logger::log("INFO", GCOM, getpid(), "Proceso de llegada de comensales finalizado.");
     return 0;
 }
 

@@ -13,7 +13,7 @@ ProcesoMozo::ProcesoMozo() : Proceso() {
 }
 
 int ProcesoMozo::ejecutarMiTarea() {
-    Logger::getInstance()->log("INFO", MOZO, getpid(), "Iniciando Mozo...");
+    Logger::log("INFO", MOZO, getpid(), "Mozo esperando a atender...");
 
     if (BUFFSIZE < Pedido::TAM_MENSAJE + 1) {
         perror("BUFFSIZE muy chico");
@@ -35,14 +35,12 @@ int ProcesoMozo::ejecutarMiTarea() {
     //// Marco como non-blocking para que no retenga la atención del mozo cuando no hay cosas esperando
     //fifoCocinado.setBlocking(false);
 
-    Logger::getInstance()->log("INFO", MOZO, getpid(), "Hola, soy un Mozo y voy a atender cada 2 segundos...");
-
     recibirNuevoPedido(fifoACocinar);//
     Restaurante::agregarGanancia(100);// TEST
     Restaurante::agregarPerdida(7);// TEST
 
     while (!sigint_handler.getGracefulQuit()){
-        Logger::getInstance()->log("INFO", MOZO, getpid(), "atendiendo...");
+        Logger::log("INFO", MOZO, getpid(), "Mozo atendiendo...");
         sleep(2);
 
         AccionMozo accion = esperarAccion(fifoCocinado);
@@ -65,7 +63,7 @@ int ProcesoMozo::ejecutarMiTarea() {
     fifoCocinado.eliminar();
 
     SignalHandler::destruir();
-    Logger::getInstance()->log("INFO", MOZO, getpid(), "Cerrando Mozo...");
+    Logger::log("INFO", MOZO, getpid(), "Proceso Mozo finalizado.");
     return 0;
 }
 
@@ -96,7 +94,7 @@ void ProcesoMozo::recibirNuevoPedido(FifoEscritura fifo) {
         enviarPedidoACocinero( fifo, pedido );
 
     } catch (std::invalid_argument ex) {
-        Logger::getInstance()->log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
+        Logger::log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
     }
 }
 
@@ -115,7 +113,7 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
     if (bytesLeidos > 0) {
         std::string mensajeDePedido = buffer;
         mensajeDePedido.resize( (unsigned long) bytesLeidos );
-        //Logger::getInstance()->log("INFO", MOZO, getpid(), "Entrego pedido: " + mensajeDePedido);
+        //Logger::log("INFO", MOZO, getpid(), "Entrego pedido: " + mensajeDePedido);
         Pedido pedidoAEntregar = Pedido::deserializar(mensajeDePedido);
 
         entregarPedido(pedidoAEntregar);

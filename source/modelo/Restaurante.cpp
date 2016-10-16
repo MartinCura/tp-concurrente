@@ -7,16 +7,20 @@
 Restaurante::Restaurante() {
     running = true;
     hay_luz = true;
-    cantRecepcionistas = 1;
+
+    cantRecepcionistas = 2;
     cantMozos = 2;
+    cantMesas = 3;
 
     iniciarCaja();
+
+    inicializarMesas();
 
     generadorComensales = new ProcesoComensales();
 
     /* Creamos los procesos para los recepcionistas */
     for (unsigned i = 0; i < cantRecepcionistas; i++)
-        recepcionistas.push_back(new ProcesoRecepcionista());
+        recepcionistas.push_back(new ProcesoRecepcionista(cantMesas));
 
     /* Creamos los procesos para los mozos */
     for (unsigned i = 0; i < cantMozos; i++)
@@ -24,14 +28,28 @@ Restaurante::Restaurante() {
 
     /* Creamos el proceso para el cocinero */
     cocinero = new ProcesoCocinero();
+
+    inicializarRecursos();
 }
 
 void Restaurante::inicializarRecursos() {
-    /* TODO capaz está al pedo (si vamos a usar semáforos, debería servir) */
+    Semaforo sem1(FILENAME_SEM_COM_RECP, 0);
+    semaforos.push_back(sem1);
+
+    Semaforo sem2(FILENAME_SEM_RECP_COM, cantRecepcionistas);
+    semaforos.push_back(sem2);
+
+    for (unsigned i = 0; i < recepcionistas.size(); i++) {
+        recepcionistas[i]->addSemaphore(SEMAFORO_COM_RECP, sem1);
+        recepcionistas[i]->addSemaphore(SEMAFORO_RECP_COM, sem2);
+    }
+    generadorComensales->addSemaphore(SEMAFORO_COM_RECP, sem1);
+    generadorComensales->addSemaphore(SEMAFORO_RECP_COM, sem2);
 }
 
 void Restaurante::eliminarRecursos() {
-    /* TODO capaz está al pedo (si vamos a usar semáforos, debería servir) */
+    for (unsigned i = 0; i < semaforos.size(); i++)
+        semaforos[i].eliminar();
 }
 
 void Restaurante::lanzarProcesos() {
@@ -57,7 +75,7 @@ void Restaurante::terminarProcesos() {
         if (proc->isStopped())
             proc->continue_();
         proc->interrupt_();
-        proc->wait_();  // TODO podría no hacerlo acá y hacerlo en un sólo for???
+        //proc->wait_();  // TODO podría no hacerlo acá y hacerlo en un sólo for???
     }
 
     for (unsigned i = 0; i < mozos.size(); i++) {
@@ -65,12 +83,19 @@ void Restaurante::terminarProcesos() {
         if (proc->isStopped())
             proc->continue_();
         proc->interrupt_();
-        proc->wait_();  // TODO podría no hacerlo acá???
+        //proc->wait_();  // TODO podría no hacerlo acá???
     }
 
     if (cocinero->isStopped())
         cocinero->continue_();
     cocinero->interrupt_();
+
+    for (unsigned i = 0; i < recepcionistas.size(); i++)
+        recepcionistas[i]->wait_();
+
+    for (unsigned i = 0; i < mozos.size(); i++)
+        mozos[i]->wait_();
+
     cocinero->wait_();
 }
 
@@ -80,7 +105,7 @@ bool Restaurante::inicializado() {
 
 void Restaurante::run() {
     try {
-        Logger::getInstance()->log("INFO", REST, getpid(), "Iniciando Restorrente...");
+        Logger::log("INFO", REST, getpid(), "Iniciando Restorrente...");
 
         lanzarProcesos();
 
@@ -95,9 +120,9 @@ void Restaurante::run() {
 
         terminarProcesos();
 
-        Logger::getInstance()->log("INFO", REST, getpid(), "Cerrando Restorrente...");
-        Logger::getInstance()->destruir();
+        eliminarRecursos();
 
+        Logger::log("INFO", REST, getpid(), "Cerrando Restorrente...");
     } catch (ProcesoTerminadoException &p) {
         std::cout << "["<< p.pid <<"] Terminado." << std::endl;
     }
@@ -123,7 +148,7 @@ void Restaurante::procesarInput(std::string input) {
 
 void Restaurante::procesarCorteDeLuz() {
     if (hay_luz) {
-        Logger::getInstance()->log("INFO", REST, getpid(), "Se generó un corte de luz");
+        Logger::log("INFO", REST, getpid(), "Se generó un corte de luz");
         /* TODO hay que "vaciar" todo (reiniciar) y parar los procesos (SIGSTOP???) hasta que vuelva la luz */
 
         /* Detenemos los procesos */
@@ -143,7 +168,7 @@ void Restaurante::procesarCorteDeLuz() {
 
 void Restaurante::procesarVueltaDeLuz() {
     if (!hay_luz) {
-        Logger::getInstance()->log("INFO", REST, getpid(), "Se reanudó el suministro de energía");
+        Logger::log("INFO", REST, getpid(), "Se reanudó el suministro de energía");
         /* TODO hay que reanudar los procesos pero en 0 (fifos vacíos y otras yerbas, etc) (SIGCONT???) */
 
         /* Reanudamos los procesos */
@@ -173,13 +198,32 @@ void Restaurante::iniciarCaja() {
     }
 }
 
+void Restaurante::inicializarMesas() {
+    char letra = 'A';
+    for (unsigned i = 0; i < cantMesas; i++) {
+        try {
+            MemoriaCompartida<Mesa> memoria(ARCHIVO_SHM_MESA, letra);
+            struct Mesa mesa = Mesa();
+            mesa.id = ++i;
+            memoria.escribir(mesa);
+            mesas.push_back(memoria);
+            letra++;
+        } catch (std::string &mensaje) {
+            Logger::log("ERR", REST, getpid(), "No se pudo crear una mesa. " + mensaje);
+            continue;
+        }
+    }
+}
+
 void Restaurante::consultarCaja() {
+    Logger::log("INFO", RECP, getpid(), "Consulta de caja");
+
     struct Caja laCaja = shmCaja.leer();
-    Logger::getInstance()->log("INFO", REST, getpid(), "---- Consulta de caja ----");
-    Logger::getInstance()->log("INFO", REST, getpid(), "- Ingresado\t Perdido -");
-    Logger::getInstance()->log("INFO", REST, getpid(),
+    Logger::log("INFO", REST, getpid(), "---- Consulta de caja ----");
+    Logger::log("INFO", REST, getpid(), "- Ingresado\t Perdido -");
+    Logger::log("INFO", REST, getpid(),
                                "- " + std::to_string(laCaja.ingreso) + "\t\t " + std::to_string(laCaja.perdido) + "\t -");
-    Logger::getInstance()->log("INFO", REST, getpid(), "--------------------------");
+    Logger::log("INFO", REST, getpid(), "--------------------------");
 }
 
 void Restaurante::agregarGanancia(int cant) {
@@ -232,4 +276,7 @@ Restaurante::~Restaurante() {
 
     if (cocinero != 0)
         delete cocinero;
+
+    semaforos.clear();
+    mesas.clear();
 }

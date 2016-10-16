@@ -9,6 +9,7 @@
 #define TP_CONCURRENTE_PROCESOCOMENSALES_H
 
 #include "Proceso.h"
+#include "../utils/Utils.h"
 
 class ProcesoComensales : public Proceso {
 private:
