@@ -83,11 +83,12 @@ void Restaurante::run() {
         lanzarProcesos();
 
         /* Manejamos los cortes y vueltas de luz y cierre del restaurante desde std::cin */
-        std::string input;
+        std::string input = "";
         while (running) {
             std::cout << "Ingrese un comando >> ";
-            std::cin >> input;
-            procesarInput(input);
+            std::getline(std::cin, input);
+            if (input != "")
+                procesarInput(input);
         }
 
         terminarProcesos();
