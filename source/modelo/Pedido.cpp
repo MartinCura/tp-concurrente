@@ -41,6 +41,10 @@ void Pedido::agregarPlato(int numPlato, int cant) {
         this->scorecard[numPlato] = maxCantPlatos;
 }
 
+int Pedido::getNumMesa() {
+    return this->num_mesa;
+}
+
 unsigned int Pedido::cantPlatos() {
     unsigned int sum = 0;
     for (int i = 0; i < CANT_PLATOS; ++i) {
@@ -48,6 +52,7 @@ unsigned int Pedido::cantPlatos() {
     }
     return sum;
 }
+
 
 std::string Pedido::serializar() {
     std::ostringstream oss;

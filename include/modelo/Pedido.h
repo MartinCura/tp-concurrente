@@ -18,10 +18,12 @@ class Pedido {
 public:
     Pedido(int numMesa);
     void agregarPlato(int numPlato, int cant = 1);
+    int getNumMesa();
     unsigned int cantPlatos();
+
+    static int TAM_MENSAJE;
     std::string serializar();
     static Pedido deserializar(std::string str_serializado);
-    static int TAM_MENSAJE;
 
 private:
     // Algún identificador para saber a qué grupo de comensales pertenece
