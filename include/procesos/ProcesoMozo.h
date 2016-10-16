@@ -17,7 +17,10 @@ class ProcesoMozo : public Proceso {
 private:
     int ejecutarMiTarea();
 
+    void recibirNuevoPedido(FifoEscritura fifo);
     void enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido);
+    void recibirPedidosListos(FifoLectura fifo);
+    void entregarPedido(Pedido pedido);
 
 public:
     ProcesoMozo();

@@ -6,12 +6,18 @@
  */
 
 #include "../../include/procesos/ProcesoMozo.h"
+#include "../../include/modelo/Restaurante.h"
 
 ProcesoMozo::ProcesoMozo() : Proceso() {
 }
 
 int ProcesoMozo::ejecutarMiTarea() {
     Logger::log("INFO", MOZO, getpid(), "Mozo esperando a atender...");
+
+    if (BUFFSIZE < Pedido::TAM_MENSAJE + 1) {
+        perror("BUFFSIZE muy chico");
+        exit(1);
+    }
 
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
@@ -25,22 +31,21 @@ int ProcesoMozo::ejecutarMiTarea() {
     // Se bloquea hasta que aparezca el cocinero
     FifoLectura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
+    // Marco como non-blocking para que no retenga la atención del mozo cuando no hay cosas esperando
+    fifoCocinado.setBlocking(false);
+
+    recibirNuevoPedido(fifoACocinar);//
+    //Restaurante::agregarGanancia(100);// TEST
+    //Restaurante::agregarPerdida(7);// TEST
 
     while (!sigint_handler.getGracefulQuit()){
         Logger::log("INFO", MOZO, getpid(), "Mozo atendiendo...");
         sleep(2);
 
-        // Recibir pedidos cocinados por cocinero
-        // Si hay, entregar a comensales correctos
-        // TODO: Cómo chequear cola sin bloquear? Semáforos? Locks?
+        // TODO Revisar forma de hacerlo no bloqueante
+        recibirPedidosListos( fifoCocinado );
 
-        try {
-            Pedido pedido(10);// Pedido de grupo de comensales TODO HARDCODE
-            enviarPedidoACocinero( fifoACocinar, pedido );
-
-        } catch (std::invalid_argument ex) {
-            Logger::log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
-        }
+        // recibirNuevoPedido(); cuando no esté hardcodeado TODO
     }
 
     fifoACocinar.cerrar();
@@ -54,10 +59,43 @@ int ProcesoMozo::ejecutarMiTarea() {
     return 0;
 }
 
+void ProcesoMozo::recibirNuevoPedido(FifoEscritura fifo) {
+    try {
+        Pedido pedido(10);// Pedido de grupo de comensales TODO HARDCODE
+        enviarPedidoACocinero( fifo, pedido );
+
+    } catch (std::invalid_argument ex) {
+        Logger::log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
+    }
+}
+
 void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
     //loggear("mensaje: " + mensaje);
-    fifo.escribir(static_cast<const void*>(mensaje.c_str()),mensaje.length() );
+    fifo.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
+}
+
+void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
+    char buffer[BUFFSIZE];
+
+    // NO bloquea si todavía no hay pedidos para entregar
+    ssize_t bytesLeidos = fifo.leer( static_cast<void*>(buffer),Pedido::TAM_MENSAJE );
+
+    if (bytesLeidos > 0) {
+        std::string mensajeDePedido = buffer;
+        mensajeDePedido.resize( (unsigned long) bytesLeidos );
+        //Logger::log("INFO", MOZO, getpid(), "Entrego pedido: " + mensajeDePedido);
+        Pedido pedidoAEntregar = Pedido::deserializar(mensajeDePedido);
+
+        entregarPedido(pedidoAEntregar);
+    }
+}
+
+void ProcesoMozo::entregarPedido(Pedido pedido) {
+    int numMesaPedido = pedido.getNumMesa();
+
+    //pedido.serializar();
+    // TODO
 }
 
 ProcesoMozo::~ProcesoMozo() {

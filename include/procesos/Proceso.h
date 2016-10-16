@@ -15,12 +15,13 @@
 #include "../handlers/SignalHandler.h"
 #include "../excepciones/Exceptions.h"
 #include "../utils/Logger.h"
+#include "../utils/Semaforo.h"
 #include "../utils/Constantes.h"
 #include "../utils/fifos/FifoLectura.h"
 #include "../utils/fifos/FifoEscritura.h"
 #include <vector>
 
-static const int BUFFSIZE = 400;//
+static const int BUFFSIZE = 400;
 
 class Proceso {
 protected:

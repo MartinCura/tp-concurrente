@@ -30,4 +30,7 @@ static const std::string ARCHIVO_FIFO_LLEGADA_COM  = "/tmp/fifo_llegada_com";
 static const std::string FILENAME_SEM_COM_RECP = "../procesos/ProcesoComensales.cpp";
 static const std::string FILENAME_SEM_RECP_COM = "../procesos/ProcesoRecepcionista.cpp";
 
+static const int SEMAFORO_COM_RECP = 1;
+static const int SEMAFORO_RECP_COM = 2;
+
 #endif //TP_CONCURRENTE_CONSTANTES_H

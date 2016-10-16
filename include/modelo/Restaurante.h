@@ -5,8 +5,6 @@
 #ifndef TP_CONCURRENTE_RESTAURANTE_H
 #define TP_CONCURRENTE_RESTAURANTE_H
 
-#include <iostream>
-#include <unistd.h>
 #include <list>
 #include "Plato.h"
 
@@ -14,8 +12,16 @@
 #include "../procesos/ProcesoMozo.h"
 #include "../procesos/ProcesoRecepcionista.h"
 #include "../procesos/ProcesoCocinero.h"
+#include "../utils/MemoriaCompartida.h"
 #include <errno.h>
 #include <vector>
+
+static const std::string ARCHIVO_SHM_CAJA = "tp_concurrente";
+
+struct Caja {
+    int ingreso = 0;
+    int perdido = 0;
+};
 
 class Restaurante {
 private:
@@ -32,6 +38,10 @@ private:
     Proceso* cocinero;  // no genérico
 
     std::vector<Semaforo> semaforos;
+
+    MemoriaCompartida<Caja> shmCaja;
+
+    void iniciarCaja();
 
     void lanzarProcesos();
     void terminarProcesos();
@@ -53,8 +63,10 @@ public:
 
     void run();
 
+    static void agregarGanancia(int cant);
+    static void agregarPerdida(int cant);
+
     ~Restaurante();
 };
-
 
 #endif //TP_CONCURRENTE_RESTAURANTE_H

@@ -10,6 +10,8 @@ Restaurante::Restaurante() {
     cantRecepcionistas = 2;
     cantMozos = 2;
 
+    //iniciarCaja();
+
     generadorComensales = new ProcesoComensales();
 
     /* Creamos los procesos para los recepcionistas */
@@ -29,11 +31,9 @@ Restaurante::Restaurante() {
 void Restaurante::inicializarRecursos() {
     /* TODO capaz está al pedo (si vamos a usar semáforos, debería servir) */
     Semaforo sem1(FILENAME_SEM_COM_RECP, 0);
-    //SemaphoreHandler::getInstance()->agregarSemaforo(SEMAFORO_COM_RECP, sem);
     semaforos.push_back(sem1);
 
     Semaforo sem2(FILENAME_SEM_RECP_COM, cantRecepcionistas);
-    //SemaphoreHandler::getInstance()->agregarSemaforo(SEMAFORO_RECP_COM, sem);
     semaforos.push_back(sem2);
 
     for (unsigned i = 0; i < recepcionistas.size(); i++) {
@@ -48,8 +48,6 @@ void Restaurante::eliminarRecursos() {
     /* TODO capaz está al pedo (si vamos a usar semáforos, debería servir) */
     for (unsigned i = 0; i < semaforos.size(); i++)
         semaforos[i].eliminar();
-
-    //SemaphoreHandler::destruir();
 }
 
 void Restaurante::lanzarProcesos() {
@@ -123,8 +121,6 @@ void Restaurante::run() {
         eliminarRecursos();
 
         Logger::log("INFO", REST, getpid(), "Cerrando Restorrente...");
-        //Logger::destruir();
-
     } catch (ProcesoTerminadoException &p) {
         std::cout << "["<< p.pid <<"] Terminado." << std::endl;
     }
@@ -188,9 +184,61 @@ void Restaurante::procesarVueltaDeLuz() {
     }
 }
 
+void Restaurante::iniciarCaja() {
+    try {
+        shmCaja = MemoriaCompartida<Caja>( ARCHIVO_SHM_CAJA,'A' );
+
+        struct Caja laCaja = Caja();
+        shmCaja.escribir( laCaja );
+
+    } catch ( std::string& mensaje ) {
+        std::cerr << mensaje << std::endl;
+    }
+}
+
 void Restaurante::consultarCaja() {
     Logger::log("INFO", RECP, getpid(), "Consulta de caja");
+
+    struct Caja laCaja = shmCaja.leer();
+    Logger::log("INFO", REST, getpid(), "---- Consulta de caja ----");
+    Logger::log("INFO", REST, getpid(), "- Ingresado\t Perdido -");
+    Logger::log("INFO", REST, getpid(),
+                               "- " + std::to_string(laCaja.ingreso) + "\t\t " + std::to_string(laCaja.perdido) + "\t -");
+    Logger::log("INFO", REST, getpid(), "--------------------------");
 }
+
+void Restaurante::agregarGanancia(int cant) {
+    if (cant < 0)
+        throw std::invalid_argument( "cant no puede ser negativa" );
+
+    try {
+        MemoriaCompartida<Caja> shmUnaCaja( ARCHIVO_SHM_CAJA,'A' );
+        // TODO Agregar lock? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        struct Caja laCaja = shmUnaCaja.leer();
+        laCaja.ingreso += cant;
+        shmUnaCaja.escribir(laCaja);
+
+    } catch ( std::string& mensaje ) {
+        std::cerr << mensaje << std::endl;
+    }
+}
+
+void Restaurante::agregarPerdida(int cant) {
+    if (cant < 0)
+        throw std::invalid_argument( "cant no puede ser negativa" );
+
+    try {
+        MemoriaCompartida<Caja> shmUnaCaja( ARCHIVO_SHM_CAJA,'A' );
+        // TODO Agregar lock? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        struct Caja laCaja = shmUnaCaja.leer();
+        laCaja.perdido += cant;
+        shmUnaCaja.escribir(laCaja);
+
+    } catch ( std::string& mensaje ) {
+        std::cerr << mensaje << std::endl;
+    }
+}
+
 
 void Restaurante::reset() {
     // Registrar comida entregada pero no pagada como pérdida
@@ -211,6 +259,4 @@ Restaurante::~Restaurante() {
         delete cocinero;
 
     semaforos.clear();
-//    for (unsigned i = 0; i < semaforos.size(); i++)
-//        delete semaforos[i];
 }

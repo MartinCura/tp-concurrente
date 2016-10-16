@@ -21,7 +21,7 @@ int ProcesoComensales::ejecutarMiTarea() {
 
     FifoEscritura fifoLlegadaCom ( ARCHIVO_FIFO_LLEGADA_COM );
     fifoLlegadaCom.abrir();
-    
+
     while (!sigint_handler.getGracefulQuit()){
         /* Tiempo que transcurre hasta que llegue el próximo grupo */
         int tiempoEspera = generarRandom(10);

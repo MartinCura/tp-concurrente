@@ -21,7 +21,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
 
     FifoLectura fifoLlegadaCom(ARCHIVO_FIFO_LLEGADA_COM);
     fifoLlegadaCom.abrir();
-    Logger::log("INFO", RECP, getpid(), "pasamos");
+    
     char buffer[BUFFSIZE];
     while (!sigint_handler.getGracefulQuit()){
         // Bloquea si todavía no hay más pedidos para cocinar
