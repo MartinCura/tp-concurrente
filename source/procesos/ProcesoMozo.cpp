@@ -11,7 +11,7 @@ ProcesoMozo::ProcesoMozo() : Proceso() {
 }
 
 int ProcesoMozo::ejecutarMiTarea() {
-    Logger::getInstance()->log("INFO", MOZO, getpid(), "Iniciando Mozo...");
+    Logger::log("INFO", MOZO, getpid(), "Mozo esperando a atender...");
 
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
@@ -26,10 +26,8 @@ int ProcesoMozo::ejecutarMiTarea() {
     FifoLectura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
 
-    Logger::getInstance()->log("INFO", MOZO, getpid(), "Hola, soy un Mozo y voy a atender cada 2 segundos...");
-
     while (!sigint_handler.getGracefulQuit()){
-        Logger::getInstance()->log("INFO", MOZO, getpid(), "atendiendo...");
+        Logger::log("INFO", MOZO, getpid(), "Mozo atendiendo...");
         sleep(2);
 
         // Recibir pedidos cocinados por cocinero
@@ -41,7 +39,7 @@ int ProcesoMozo::ejecutarMiTarea() {
             enviarPedidoACocinero( fifoACocinar, pedido );
 
         } catch (std::invalid_argument ex) {
-            Logger::getInstance()->log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
+            Logger::log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
         }
     }
 
@@ -52,7 +50,7 @@ int ProcesoMozo::ejecutarMiTarea() {
     fifoCocinado.eliminar();
 
     SignalHandler::destruir();
-    Logger::getInstance()->log("INFO", MOZO, getpid(), "Cerrando Mozo...");
+    Logger::log("INFO", MOZO, getpid(), "Proceso Mozo finalizado.");
     return 0;
 }
 

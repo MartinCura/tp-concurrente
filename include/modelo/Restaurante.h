@@ -31,6 +31,8 @@ private:
     std::vector<Proceso*> mozos;
     Proceso* cocinero;  // no genérico
 
+    std::vector<Semaforo> semaforos;
+
     void lanzarProcesos();
     void terminarProcesos();
 
