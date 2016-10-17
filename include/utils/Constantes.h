@@ -20,6 +20,8 @@
 #define RECP    "RECP"
 #define REST    "REST"
 #define GCOM    "GCOM"
+#define PMM_    "PMM_"
+#define COMN    "COMN"
 
 static const int MAX_COMENSALES_EN_GRUPO = 5;
 

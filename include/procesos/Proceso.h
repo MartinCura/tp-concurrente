@@ -15,7 +15,7 @@
 #include "../handlers/SignalHandler.h"
 #include "../excepciones/Exceptions.h"
 #include "../utils/Logger.h"
-#include "../utils/Semaforo.h"
+//#include "../utils/Semaforo.h"
 #include "../utils/Constantes.h"
 #include "../utils/fifos/FifoLectura.h"
 #include "../utils/fifos/FifoEscritura.h"
@@ -27,14 +27,14 @@ class Proceso {
 protected:
     pid_t pid;
     bool stopped;
-    std::vector<Semaforo> _semaforos;
+//    std::vector<Semaforo> _semaforos;
 
     virtual int ejecutarMiTarea() = 0;
 
 public:
     Proceso();
 
-    void addSemaphore(int id, Semaforo& sem);
+//    void addSemaphore(int id, Semaforo& sem);
 
     bool isStopped();
 

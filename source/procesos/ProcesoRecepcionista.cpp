@@ -7,32 +7,10 @@
 
 #include "../../include/procesos/ProcesoRecepcionista.h"
 
-ProcesoRecepcionista::ProcesoRecepcionista(/*int cant_mesas*/) : Proceso() {
-//    cantidadMesas = cant_mesas;
-}
-/*
-void ProcesoRecepcionista::inicializarMesasCompartidas() {
-    char letra = 'A';
-    for (unsigned i = 0; i < cantidadMesas; i++) {
-        try {
-            MemoriaCompartida<Mesa> mesa(ARCHIVO_SHM_MESA, letra);
-            mesas.push_back(mesa);
-            letra++;
-        } catch (std::string &mensaje) {
-            Logger::log("ERR", RECP, getpid(), "No se pudo crear la mesa con id " + std::to_string(i+1) + ". " + mensaje);
-            continue;
-        }
-    }
+ProcesoRecepcionista::ProcesoRecepcionista() : Proceso() {
 }
 
-void ProcesoRecepcionista::destruirMesasCompartidas() {
-    for (unsigned i = 0; i < mesas.size(); i++)
-        mesas[i].liberar();
-}
-*/
 int ProcesoRecepcionista::ejecutarMiTarea() {
-    //inicializarMesasCompartidas();
-
     Logger::log("INFO", RECP, getpid(), "Recepcionista esperando para atender...");
 
     SIGINT_Handler sigint_handler;
@@ -42,14 +20,13 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     fifoLlegadaCom.abrir();
 
     FifoLectura fifoMesasLibres(ARCHIVO_FIFO_MESAS_LIBRES);
-    fifoMesasLibres.abrir();
-    fifoMesasLibres.setBlocking(false);
+    fifoMesasLibres.abrir(false);
+
+    FifoLectura fifoLivingLec(ARCHIVO_FIFO_LIVING_COM);
+    fifoLivingLec.abrir(false);
 
     FifoEscritura fifoLivingEsc(ARCHIVO_FIFO_LIVING_COM);
     fifoLivingEsc.abrir();
-    FifoLectura fifoLivingLec(ARCHIVO_FIFO_LIVING_COM);
-    fifoLivingLec.abrir();
-    fifoLivingLec.setBlocking(false);
 
     char buffer[BUFFSIZE];
     while (!sigint_handler.getGracefulQuit()){
@@ -63,12 +40,14 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
         }
 
         if (id_Mesa > -1) {
+            /* Vemos si hay gente en el living */
             bytesLeidos = fifoLivingLec.leer( static_cast<void*>(buffer), 1);
             if (bytesLeidos > 0) {
                 std::string mensaje = buffer;
                 mensaje.resize ( (unsigned long) bytesLeidos );
                 Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(id_Mesa) + ".");
             } else {
+                /* Si no hay gente en el living esperamos en la entrada */
                 // Bloquea si todavía no hay más pedidos para cocinar
                 bytesLeidos = fifoLlegadaCom.leer( static_cast<void*>(buffer), 1);
                 if (bytesLeidos > 0) {
@@ -78,6 +57,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 }
             }
         } else {
+            /* Como no hay mesas disponibles, las personas que lleguen pasarán al living */
             // Bloquea si todavía no hay más pedidos para cocinar
             bytesLeidos = fifoLlegadaCom.leer( static_cast<void*>(buffer), 1);
             if (bytesLeidos > 0) {
@@ -87,24 +67,9 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en el living.");
             }
         }
-/*
-        // Bloquea si todavía no hay más pedidos para cocinar
-        bytesLeidos = fifoLlegadaCom.leer( static_cast<void*>(buffer), 1);
-        if (bytesLeidos > 0) {
-            std::string mensaje = buffer;
-            mensaje.resize ( (unsigned long) bytesLeidos );
-            if (id_Mesa > -1)
-                Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(id_Mesa) + ".");
-            else {
-                fifoLivingEsc.escribir(static_cast<const void*>(mensaje.c_str()), mensaje.length());
-                Logger::log("INFO", RECP, getpid(), "Atendiendo a un grupo de " + mensaje + ".");
-            }
-        }
-*/
     }
     SignalHandler::destruir();
     Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
-//    destruirMesasCompartidas();
     fifoLlegadaCom.cerrar();
     fifoMesasLibres.cerrar();
     fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */

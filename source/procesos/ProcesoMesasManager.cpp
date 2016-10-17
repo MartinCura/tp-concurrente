@@ -19,6 +19,7 @@ void ProcesoMesasManager::lanzarMesasDisponiblesIniciales(FifoEscritura fifo) {
 }
 
 int ProcesoMesasManager::ejecutarMiTarea() {
+    Logger::log("INFO", PMM_, getpid(), "Iniciando Proceso Mesas Manager...");
     FifoEscritura fifoMesasLibres(ARCHIVO_FIFO_MESAS_LIBRES);
 //    FifoLectura fifoMesasLiberadas(ARCHIVO_FIFO_MESAS_LIBERADAS);
     fifoMesasLibres.abrir();
@@ -51,7 +52,7 @@ int ProcesoMesasManager::ejecutarMiTarea() {
         }
     }
     SignalHandler::destruir();
-    Logger::log("INFO", "PMM_", getpid(), "Proceso Mesas Manager finalizado.");
+    Logger::log("INFO", PMM_, getpid(), "Proceso Mesas Manager finalizado.");
     fifoMesasLibres.cerrar();
     fifoMesasLibres.eliminar();
     return 0;
@@ -74,7 +75,7 @@ void ProcesoMesasManager::reset() {
             letra++;
 
         } catch (std::string &mensaje) {
-            Logger::log("ERR", REST, getpid(), "No se pudo acceder a una mesa. " + mensaje);
+            Logger::log("ERR", PMM_, getpid(), "No se pudo acceder a una mesa. " + mensaje);
             continue;
         }
     }

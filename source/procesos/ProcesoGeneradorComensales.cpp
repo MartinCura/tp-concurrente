@@ -29,7 +29,7 @@ int ProcesoGeneradorComensales::ejecutarMiTarea() {
         std::string num_s = std::to_string(cantComensales);
 
         Logger::log("INFO", GCOM, getpid(), "Llegó un grupo de comensales de " + num_s + " personas.");
-        Logger::log("INFO", GCOM, getpid(), "Grupo de comensales de " + num_s + " esperando en la entrada para ser atendidos");
+        Logger::log("INFO", GCOM, getpid(), "Grupo de comensales de " + num_s + " esperando en la entrada para ser atendidos.");
         fifoLlegadaCom.escribir(static_cast<const void*>(num_s.c_str()), num_s.length());
     }
     SignalHandler::destruir();

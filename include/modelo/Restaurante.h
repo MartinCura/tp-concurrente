@@ -30,19 +30,12 @@ private:
     std::vector<Proceso*> mozos;
     Proceso* cocinero;  // no genérico
 
-    std::vector<Semaforo> semaforos;
-
     MemoriaCompartida<Caja> shmCaja;
-//    std::vector<MemoriaCompartida<Mesa>> mesas;
 
     void iniciarCaja();
-//    void inicializarMesas();
 
     void lanzarProcesos();
     void terminarProcesos();
-
-    void inicializarRecursos();
-    void eliminarRecursos();
 
     void reset();
 

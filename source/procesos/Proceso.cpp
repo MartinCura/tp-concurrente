@@ -31,9 +31,9 @@ pid_t Proceso::getPID() {
     return pid;
 }
 
-void Proceso::addSemaphore(int id, Semaforo& sem) {
-    _semaforos.push_back(sem);
-}
+//void Proceso::addSemaphore(int id, Semaforo& sem) {
+//    _semaforos.push_back(sem);
+//}
 
 int Proceso::wait_() {
     return waitpid(pid, 0, 0);
