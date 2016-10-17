@@ -43,10 +43,13 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
 
     FifoLectura fifoMesasLibres(ARCHIVO_FIFO_MESAS_LIBRES);
     fifoMesasLibres.abrir();
-    //fifoMesasLibres.setBlocking(false);
+    fifoMesasLibres.setBlocking(false);
 
     FifoEscritura fifoLivingEsc(ARCHIVO_FIFO_LIVING_COM);
     fifoLivingEsc.abrir();
+    FifoLectura fifoLivingLec(ARCHIVO_FIFO_LIVING_COM);
+    fifoLivingLec.abrir();
+    fifoLivingLec.setBlocking(false);
 
     char buffer[BUFFSIZE];
     while (!sigint_handler.getGracefulQuit()){
@@ -58,6 +61,33 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
             id_Mesa = atoi(msg.c_str());
             Logger::log("INFO", RECP, getpid(), "Mesa disponible con id : " + std::to_string(id_Mesa) + ".");
         }
+
+        if (id_Mesa > -1) {
+            bytesLeidos = fifoLivingLec.leer( static_cast<void*>(buffer), 1);
+            if (bytesLeidos > 0) {
+                std::string mensaje = buffer;
+                mensaje.resize ( (unsigned long) bytesLeidos );
+                Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(id_Mesa) + ".");
+            } else {
+                // Bloquea si todavía no hay más pedidos para cocinar
+                bytesLeidos = fifoLlegadaCom.leer( static_cast<void*>(buffer), 1);
+                if (bytesLeidos > 0) {
+                    std::string mensaje = buffer;
+                    mensaje.resize ( (unsigned long) bytesLeidos );
+                    Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(id_Mesa) + ".");
+                }
+            }
+        } else {
+            // Bloquea si todavía no hay más pedidos para cocinar
+            bytesLeidos = fifoLlegadaCom.leer( static_cast<void*>(buffer), 1);
+            if (bytesLeidos > 0) {
+                std::string mensaje = buffer;
+                mensaje.resize ( (unsigned long) bytesLeidos );
+                fifoLivingEsc.escribir(static_cast<const void*>(mensaje.c_str()), mensaje.length());
+                Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en el living.");
+            }
+        }
+/*
         // Bloquea si todavía no hay más pedidos para cocinar
         bytesLeidos = fifoLlegadaCom.leer( static_cast<void*>(buffer), 1);
         if (bytesLeidos > 0) {
@@ -70,6 +100,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 Logger::log("INFO", RECP, getpid(), "Atendiendo a un grupo de " + mensaje + ".");
             }
         }
+*/
     }
     SignalHandler::destruir();
     Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
@@ -77,6 +108,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     fifoLlegadaCom.cerrar();
     fifoMesasLibres.cerrar();
     fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
+    fifoLivingLec.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
 
     return 0;
 }
