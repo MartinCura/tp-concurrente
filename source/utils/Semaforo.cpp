@@ -1,4 +1,5 @@
 #include "../../include/utils/Semaforo.h"
+Semaforo::Semaforo(){}
 
 Semaforo :: Semaforo ( const std::string& nombre,const int valorInicial ):valorInicial(valorInicial) {
 	key_t clave = ftok ( nombre.c_str(),'a' );

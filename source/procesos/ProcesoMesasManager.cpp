@@ -15,6 +15,7 @@ void ProcesoMesasManager::lanzarMesasDisponiblesIniciales(FifoEscritura fifo) {
     for (unsigned i = 0; i < cantMesas; i++) {
         std::string let = std::to_string(i);
         fifo.escribir(static_cast<const void*>(let.c_str()), 2);
+        Logger::log("INFO", PMM_, getpid(), "Todas las mesas fueron inicializadas...");
     }
 }
 
@@ -31,6 +32,7 @@ int ProcesoMesasManager::ejecutarMiTarea() {
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
     while (!sigint_handler.getGracefulQuit()) {
+//        ssize_t bytesLeidos = fifoMesasLiberadas.leer();
         char letra = 'a';
         for (unsigned i = 0; i < cantMesas; ++i) {
             try {

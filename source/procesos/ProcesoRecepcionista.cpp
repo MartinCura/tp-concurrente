@@ -36,7 +36,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
             std::string msg = buffer;
             msg.resize(bytesLeidos);
             id_Mesa = atoi(msg.c_str());
-            Logger::log("INFO", RECP, getpid(), "Mesa disponible con id : " + std::to_string(id_Mesa) + ".");
+            //Logger::log("INFO", RECP, getpid(), "Mesa disponible con id : " + std::to_string(id_Mesa) + ".");
         }
 
         if (id_Mesa > -1) {
@@ -45,7 +45,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
             if (bytesLeidos > 0) {
                 std::string mensaje = buffer;
                 mensaje.resize ( (unsigned long) bytesLeidos );
-                Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(id_Mesa) + ".");
+                Logger::log("INFO", RECP, getpid(), "Sacando comensales (" + mensaje + ") del living y ubicando en la mesa " + std::to_string(id_Mesa) + ".");
             } else {
                 /* Si no hay gente en el living esperamos en la entrada */
                 // Bloquea si todavía no hay más pedidos para cocinar
@@ -55,6 +55,19 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                     mensaje.resize ( (unsigned long) bytesLeidos );
                     Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(id_Mesa) + ".");
                 }
+            }
+            ProcesoComensales* proc = new ProcesoComensales(id_Mesa);
+            comensales.push_back(proc);
+            try {
+                proc->start();
+            } catch (ProcesoTerminadoException &p) {
+                SignalHandler::destruir();
+                fifoLlegadaCom.cerrar();
+                fifoMesasLibres.cerrar();
+                fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
+                fifoLivingLec.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
+                Logger::log("INFO", COMN, getpid(), "Comensales retirándose del restaurante.");
+                throw ProcesoTerminadoException(p.pid);
             }
         } else {
             /* Como no hay mesas disponibles, las personas que lleguen pasarán al living */
@@ -71,13 +84,17 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     SignalHandler::destruir();
     Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
     fifoLlegadaCom.cerrar();
+    //fifoLlegadaCom.eliminar();
     fifoMesasLibres.cerrar();
+    //fifoMesasLibres.eliminar();
     fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
+    fifoLivingEsc.eliminar();
     fifoLivingLec.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
-
+    fifoLivingLec.eliminar();
     return 0;
 }
 
 ProcesoRecepcionista::~ProcesoRecepcionista() {
-
+    for (unsigned i = 0; i < comensales.size(); i++)
+        delete comensales[i];
 }

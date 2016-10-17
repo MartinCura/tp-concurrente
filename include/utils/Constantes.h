@@ -25,6 +25,8 @@
 
 static const int MAX_COMENSALES_EN_GRUPO = 5;
 
+static const std::string ARCHIVO_FIFO_NUEVOS_PEDIDOS  = "/tmp/fifo_nuevos_pedidos";
+
 static const std::string ARCHIVO_FIFO_COCINAR  = "/tmp/fifo_cocinar";
 static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";
 

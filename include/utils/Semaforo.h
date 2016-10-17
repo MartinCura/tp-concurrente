@@ -15,6 +15,7 @@ private:
 	int inicializar () const;
 
 public:
+	Semaforo();
 	Semaforo ( const std::string& nombre,const int valorInicial );
 	~Semaforo();
 

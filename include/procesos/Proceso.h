@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "../handlers/SIGINT_Handler.h"
+#include "../handlers/SIGTERM_Handler.h"
 #include "../handlers/SignalHandler.h"
 #include "../excepciones/Exceptions.h"
 #include "../utils/Logger.h"

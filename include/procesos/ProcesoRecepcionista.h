@@ -8,11 +8,12 @@
 #ifndef TP_CONCURRENTE_PROCESORECEPCIONISTA_H
 #define TP_CONCURRENTE_PROCESORECEPCIONISTA_H
 
-#include "Proceso.h"
+#include "ProcesoComensales.h"
 #include <stdlib.h>
 
 class ProcesoRecepcionista : public Proceso {
 private:
+    std::vector<ProcesoComensales*> comensales;
     int ejecutarMiTarea();
 
 public:

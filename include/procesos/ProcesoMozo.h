@@ -21,8 +21,8 @@ class ProcesoMozo : public Proceso {
 private:
     int ejecutarMiTarea();
 
-    AccionMozo esperarAccion(FifoLectura fifoCocinado);
-    void recibirNuevoPedido(FifoEscritura fifo);
+    AccionMozo esperarAccion(std::vector<FifoLectura> fifos);
+    void recibirNuevoPedido(FifoLectura fifoNuevosPedidos, FifoEscritura fifoCocinero);
     void enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido);
     void recibirPedidosListos(FifoLectura fifo);
     void entregarPedido(Pedido pedido);

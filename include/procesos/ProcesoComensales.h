@@ -9,14 +9,16 @@
 #define TP_CONCURRENTE_PROCESOCOMENSALES_H
 
 #include "Proceso.h"
+#include "../modelo/Pedido.h"
 #include "../utils/Utils.h"
 
 class ProcesoComensales : public Proceso {
 private:
+    int id_Mesa;
     int ejecutarMiTarea();
 
 public:
-    ProcesoComensales();
+    ProcesoComensales(int idMesa);
 
     ~ProcesoComensales();
 };
