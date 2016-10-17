@@ -10,6 +10,13 @@ void FifoLectura::abrir() {
 	fd = open ( nombre.c_str(),O_RDONLY );
 }
 
+void FifoLectura::abrir(bool bloqueante) {
+	if (bloqueante)
+		abrir();
+	else
+		fd = open ( nombre.c_str(),O_RDONLY|O_NONBLOCK );
+}
+
 ssize_t FifoLectura::leer(void* buffer,const ssize_t buffsize) const {
 	ssize_t ret;
 	// Si falla y el error no es por estar en no bloqueante...

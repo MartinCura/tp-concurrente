@@ -9,6 +9,7 @@ public:
 	~FifoLectura();
 
 	void abrir();
+	void abrir(bool bloqueante);
 	ssize_t leer(void* buffer,const ssize_t buffsize) const;
 };
 
