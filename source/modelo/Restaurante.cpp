@@ -11,18 +11,18 @@ Restaurante::Restaurante() {
 
     cantRecepcionistas = 2;//
     cantMozos = 2;//
-    cantMesas = 100;//
+    cantMesas = 10;//
 
     iniciarCaja();
 
-    inicializarMesas();
-    mesasManager = new ProcesoMesasManager();
+//    inicializarMesas();
+    mesasManager = new ProcesoMesasManager(cantMesas);
 
-    generadorComensales = new ProcesoComensales();
+    generadorComensales = new ProcesoGeneradorComensales();
 
     /* Creamos los procesos para los recepcionistas */
     for (unsigned i = 0; i < cantRecepcionistas; i++)
-        recepcionistas.push_back(new ProcesoRecepcionista(cantMesas));
+        recepcionistas.push_back(new ProcesoRecepcionista(/*cantMesas*/));
 
     /* Creamos los procesos para los mozos */
     for (unsigned i = 0; i < cantMozos; i++)
@@ -211,7 +211,7 @@ void Restaurante::iniciarCaja() {
         std::cerr << mensaje << std::endl;
     }
 }
-
+/*
 // TODO: Mover a ProcesoMesasManager??
 void Restaurante::inicializarMesas() {
     char letra = 'a';
@@ -229,7 +229,7 @@ void Restaurante::inicializarMesas() {
         }
     }
 }
-
+*/
 void Restaurante::consultarCaja() {
     Logger::log("INFO", RECP, getpid(), "Consulta de caja");
 
@@ -296,5 +296,5 @@ Restaurante::~Restaurante() {
         delete cocinero;
 
     semaforos.clear();
-    mesas.clear();
+//    mesas.clear();
 }

@@ -6,13 +6,17 @@
 #define TP_CONCURRENTE_PROCESOMESASMANAGER_H
 
 #include "Proceso.h"
+#include "../utils/MemoriaCompartida.h"
 
 class ProcesoMesasManager : public Proceso {
 private:
+    int cantMesas;
+
     int ejecutarMiTarea();
+    void lanzarMesasDisponiblesIniciales(FifoEscritura fifo);
 
 public:
-    ProcesoMesasManager();
+    ProcesoMesasManager(int cantMesas);
     void reset();
     ~ProcesoMesasManager();
 };

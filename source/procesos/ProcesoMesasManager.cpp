@@ -7,11 +7,24 @@
 #include <modelo/Restaurante.h>
 #include "procesos/ProcesoMesasManager.h"
 
-ProcesoMesasManager::ProcesoMesasManager() : Proceso() {
+ProcesoMesasManager::ProcesoMesasManager(int cantMesas) : Proceso() {
+    this->cantMesas = cantMesas;
+}
+
+void ProcesoMesasManager::lanzarMesasDisponiblesIniciales(FifoEscritura fifo) {
+    for (unsigned i = 0; i < cantMesas; i++) {
+        std::string let = std::to_string(i);
+        fifo.escribir(static_cast<const void*>(let.c_str()), 2);
+    }
 }
 
 int ProcesoMesasManager::ejecutarMiTarea() {
-    int cantMesas = 1000; //hardcodeo
+    FifoEscritura fifoMesasLibres(ARCHIVO_FIFO_MESAS_LIBRES);
+//    FifoLectura fifoMesasLiberadas(ARCHIVO_FIFO_MESAS_LIBERADAS);
+    fifoMesasLibres.abrir();
+//    fifoMesasLiberadas.abrir();
+
+    lanzarMesasDisponiblesIniciales(fifoMesasLibres);
 
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
@@ -37,12 +50,16 @@ int ProcesoMesasManager::ejecutarMiTarea() {
             }
         }
     }
+    SignalHandler::destruir();
+    Logger::log("INFO", "PMM_", getpid(), "Proceso Mesas Manager finalizado.");
+    fifoMesasLibres.cerrar();
+    fifoMesasLibres.eliminar();
     return 0;
 }
 
 void ProcesoMesasManager::reset() {
     char letra = 'a';
-    int cantMesas = 1000;//
+    int cantMesas = 10;//
     for (unsigned i = 0; i < cantMesas; ++i) {
         try {
             MemoriaCompartida<Mesa> shmMesa(ARCHIVO_SHM_MESA, letra);

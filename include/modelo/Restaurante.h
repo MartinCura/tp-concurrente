@@ -8,11 +8,12 @@
 #include <list>
 #include "Plato.h"
 
-#include "../procesos/ProcesoComensales.h"
+#include "../procesos/ProcesoGeneradorComensales.h"
 #include "../procesos/ProcesoMozo.h"
 #include "../procesos/ProcesoRecepcionista.h"
 #include "../procesos/ProcesoCocinero.h"
 #include "../procesos/ProcesoMesasManager.h"
+#include "ObjetosDeRestaurante.h"
 
 class Restaurante {
 private:
@@ -32,10 +33,10 @@ private:
     std::vector<Semaforo> semaforos;
 
     MemoriaCompartida<Caja> shmCaja;
-    std::vector<MemoriaCompartida<Mesa>> mesas;
+//    std::vector<MemoriaCompartida<Mesa>> mesas;
 
     void iniciarCaja();
-    void inicializarMesas();
+//    void inicializarMesas();
 
     void lanzarProcesos();
     void terminarProcesos();

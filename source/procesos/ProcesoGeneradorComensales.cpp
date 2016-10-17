@@ -1,17 +1,17 @@
 /*
- * ProcesoComensales.cpp
+ * ProcesoGeneradorComensales.cpp
  *
- *  Created on: Oct 14, 2016
+ *  Created on: Oct 16, 2016
  *      Author: emanuel
  */
 
-#include "../../include/procesos/ProcesoComensales.h"
+#include "../../include/procesos/ProcesoGeneradorComensales.h"
 
-ProcesoComensales::ProcesoComensales() : Proceso() {
+ProcesoGeneradorComensales::ProcesoGeneradorComensales() : Proceso() {
 }
 
-int ProcesoComensales::ejecutarMiTarea() {
-    Logger::log("INFO", GCOM, getpid(), "Iniciando comensales...");
+int ProcesoGeneradorComensales::ejecutarMiTarea() {
+    Logger::log("INFO", GCOM, getpid(), "Iniciando Generador de comensales...");
 
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
@@ -41,6 +41,6 @@ int ProcesoComensales::ejecutarMiTarea() {
     return 0;
 }
 
-ProcesoComensales::~ProcesoComensales() {
+ProcesoGeneradorComensales::~ProcesoGeneradorComensales() {
 
 }

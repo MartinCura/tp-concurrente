@@ -7,10 +7,10 @@
 
 #include "../../include/procesos/ProcesoRecepcionista.h"
 
-ProcesoRecepcionista::ProcesoRecepcionista(int cant_mesas) : Proceso() {
-    cantidadMesas = cant_mesas;
+ProcesoRecepcionista::ProcesoRecepcionista(/*int cant_mesas*/) : Proceso() {
+//    cantidadMesas = cant_mesas;
 }
-
+/*
 void ProcesoRecepcionista::inicializarMesasCompartidas() {
     char letra = 'A';
     for (unsigned i = 0; i < cantidadMesas; i++) {
@@ -29,9 +29,9 @@ void ProcesoRecepcionista::destruirMesasCompartidas() {
     for (unsigned i = 0; i < mesas.size(); i++)
         mesas[i].liberar();
 }
-
+*/
 int ProcesoRecepcionista::ejecutarMiTarea() {
-    inicializarMesasCompartidas();
+    //inicializarMesasCompartidas();
 
     Logger::log("INFO", RECP, getpid(), "Recepcionista esperando para atender...");
 
@@ -41,23 +41,42 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     FifoLectura fifoLlegadaCom(ARCHIVO_FIFO_LLEGADA_COM);
     fifoLlegadaCom.abrir();
 
-    FifoEscritura fifoLivingEsc();
-    FifoLectura fifoLivingLec();
+    FifoLectura fifoMesasLibres(ARCHIVO_FIFO_MESAS_LIBRES);
+    fifoMesasLibres.abrir();
+    //fifoMesasLibres.setBlocking(false);
+
+    FifoEscritura fifoLivingEsc(ARCHIVO_FIFO_LIVING_COM);
+    fifoLivingEsc.abrir();
 
     char buffer[BUFFSIZE];
     while (!sigint_handler.getGracefulQuit()){
+        int id_Mesa = -1;
+        ssize_t bytesLeidos = fifoMesasLibres.leer( static_cast<void*>(buffer), 2);
+        if (bytesLeidos > 0) {
+            std::string msg = buffer;
+            msg.resize(bytesLeidos);
+            id_Mesa = atoi(msg.c_str());
+            Logger::log("INFO", RECP, getpid(), "Mesa disponible con id : " + std::to_string(id_Mesa) + ".");
+        }
         // Bloquea si todavía no hay más pedidos para cocinar
-        ssize_t bytesLeidos = fifoLlegadaCom.leer( static_cast<void*>(buffer), 1);
+        bytesLeidos = fifoLlegadaCom.leer( static_cast<void*>(buffer), 1);
         if (bytesLeidos > 0) {
             std::string mensaje = buffer;
             mensaje.resize ( (unsigned long) bytesLeidos );
-            Logger::log("INFO", RECP, getpid(), "Atendiendo a un grupo de " + mensaje + ".");
+            if (id_Mesa > -1)
+                Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(id_Mesa) + ".");
+            else {
+                fifoLivingEsc.escribir(static_cast<const void*>(mensaje.c_str()), mensaje.length());
+                Logger::log("INFO", RECP, getpid(), "Atendiendo a un grupo de " + mensaje + ".");
+            }
         }
     }
     SignalHandler::destruir();
     Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
-    destruirMesasCompartidas();
+//    destruirMesasCompartidas();
     fifoLlegadaCom.cerrar();
+    fifoMesasLibres.cerrar();
+    fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
 
     return 0;
 }
