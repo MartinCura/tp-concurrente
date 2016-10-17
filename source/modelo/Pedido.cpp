@@ -11,7 +11,7 @@
  * de tamaño prefijado, decidiendo la cantidad de dígitos del número de mesa y de la cantidad de platos
  * Número de mesa está entre 000 y 999 mientras que se puede pedir entre 00 y 99 de un plato en un Pedido.
  * TODO: Ajustar este mensaje para la entrega.
- */
+*/
 int CANT_PLATOS = 100;  // Platos distintos disponibles
 int TAM_NUM_MESA = 3;   // Mesas disponibles = 10^TAM_NUM_MESA
 int TAM_CANT_PLATO = 2; // Orden máxima de un cierto plato por Pedido = 10^TAM_CANT_PLATO

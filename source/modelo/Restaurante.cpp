@@ -2,19 +2,21 @@
 // Created by martin on 27/09/16.
 //
 
+#include <procesos/ProcesoMesasManager.h>
 #include "../../include/modelo/Restaurante.h"
 
 Restaurante::Restaurante() {
     running = true;
     hay_luz = true;
 
-    cantRecepcionistas = 2;
-    cantMozos = 2;
-    cantMesas = 3;
+    cantRecepcionistas = 2;//
+    cantMozos = 2;//
+    cantMesas = 100;//
 
     iniciarCaja();
 
     inicializarMesas();
+    mesasManager = new ProcesoMesasManager();
 
     generadorComensales = new ProcesoComensales();
 
@@ -53,6 +55,8 @@ void Restaurante::eliminarRecursos() {
 }
 
 void Restaurante::lanzarProcesos() {
+    mesasManager->start();
+
     generadorComensales->start();
 
     for (unsigned i = 0; i < recepcionistas.size(); i++)
@@ -65,6 +69,11 @@ void Restaurante::lanzarProcesos() {
 }
 
 void Restaurante::terminarProcesos() {
+    if (mesasManager->isStopped())
+        mesasManager->continue_();
+    mesasManager->interrupt_();
+    mesasManager->wait_();
+
     if (generadorComensales->isStopped())
         generadorComensales->continue_();
     generadorComensales->interrupt_();
@@ -129,7 +138,8 @@ void Restaurante::run() {
 }
 
 void Restaurante::procesarInput(std::string input) {
-    if (input == QUIT)
+    // normalizar input a minúsculas
+    if (input == QUIT || input == "exit")
         running = false;
     else if (input == CORTAR_LUZ)
         procesarCorteDeLuz();
@@ -161,6 +171,10 @@ void Restaurante::procesarCorteDeLuz() {
             mozos[i]->stop_();
 
         cocinero->stop_();
+
+        mesasManager->reset();
+
+
 
         hay_luz = false;
     }
@@ -198,13 +212,14 @@ void Restaurante::iniciarCaja() {
     }
 }
 
+// TODO: Mover a ProcesoMesasManager??
 void Restaurante::inicializarMesas() {
-    char letra = 'A';
+    char letra = 'a';
     for (unsigned i = 0; i < cantMesas; i++) {
         try {
             MemoriaCompartida<Mesa> memoria(ARCHIVO_SHM_MESA, letra);
             struct Mesa mesa = Mesa();
-            mesa.id = ++i;
+            mesa.id = i;
             memoria.escribir(mesa);
             mesas.push_back(memoria);
             letra++;
@@ -265,6 +280,9 @@ void Restaurante::reset() {
 }
 
 Restaurante::~Restaurante() {
+    if (mesasManager != 0)
+        delete mesasManager;
+
     if (generadorComensales != 0)
         delete generadorComensales;
 

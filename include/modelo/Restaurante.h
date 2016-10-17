@@ -12,6 +12,7 @@
 #include "../procesos/ProcesoMozo.h"
 #include "../procesos/ProcesoRecepcionista.h"
 #include "../procesos/ProcesoCocinero.h"
+#include "../procesos/ProcesoMesasManager.h"
 
 class Restaurante {
 private:
@@ -22,6 +23,7 @@ private:
         cantMesas;
     std::list<Plato> listPlatos;
 
+    ProcesoMesasManager* mesasManager;
     Proceso* generadorComensales;
     std::vector<Proceso*> recepcionistas;
     std::vector<Proceso*> mozos;

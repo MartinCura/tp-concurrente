@@ -20,6 +20,7 @@ struct Mesa {
     int id = 0;
     bool ocupada = false;
     int cant_comensales = 0;
+    int gastado = 0;
 };
 
 #endif /*TP_CONCURRENTE_OBJETOSDERESTAURANTE_H*/

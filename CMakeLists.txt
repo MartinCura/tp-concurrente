@@ -8,4 +8,4 @@ include_directories(include)
 
 file(GLOB_RECURSE SOURCES "source/*.cpp")
 
-add_executable(tp_concurrente "source/main.cpp" ${SOURCES})
+add_executable(tp_concurrente "source/main.cpp" ${SOURCES} source/procesos/ProcesoMesasManager.cpp include/procesos/ProcesoMesasManager.h)
