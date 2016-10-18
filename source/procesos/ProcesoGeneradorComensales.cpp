@@ -21,7 +21,7 @@ int ProcesoGeneradorComensales::ejecutarMiTarea() {
 
     while (!sigint_handler.getGracefulQuit()){
         /* Tiempo que transcurre hasta que llegue el próximo grupo */
-        int tiempoEspera = Utils::generarRandom(4);
+        unsigned tiempoEspera = (unsigned) Utils::generarRandom(4);
         sleep(tiempoEspera);
         //dormir(tiempoEspera); /* TODO Es un "slepp" sin sleep asi que vale */
         /* Cantidad de comensales en el grupo que llegó */

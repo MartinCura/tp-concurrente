@@ -20,7 +20,7 @@ int ProcesoComensalesManager::ejecutarMiTarea() {
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
-    char buffer[BUFFSIZE];
+    char buffer[BUFFSIZE] = "";
     while (!sigint_handler.getGracefulQuit()){
         /* Lee el id de mesa que fue ocupada y la cantidad de ocupantes)*/
         /* TODO podríamos leer la cantidad de personas por grupo. */

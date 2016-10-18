@@ -5,6 +5,7 @@
  *      Author: emanuel
  */
 
+#include <procesos/ProcesoMesasManager.h>
 #include "../../include/procesos/ProcesoRecepcionista.h"
 
 ProcesoRecepcionista::ProcesoRecepcionista() : Proceso() {
@@ -33,12 +34,14 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
 
     // oh dios demasiadas fifos
 
-    char buffer[TAM_NUM_MESA+1];
+    char buffer[TAM_NUM_MESA+1] = "";
 
     while (!sigint_handler.getGracefulQuit()){
 
         int idMesa = -1;
-        ssize_t bytesLeidos = fifoMesasLibres.leer( static_cast<void*>(buffer),TAM_NUM_MESA );
+        ssize_t bytesLeidos = 0;
+
+        bytesLeidos = fifoMesasLibres.leer( static_cast<void*>(buffer),TAM_NUM_MESA );
         if (bytesLeidos > 0) {
             std::ostringstream oss;//
             oss << "PR leí en fifoMesasLibres: `" << buffer << "`" << std::endl;//
@@ -51,7 +54,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
         }
 
         if (idMesa > -1) {
-            std::string count_s = "";
+            std::string count_s = "0";
             /* Vemos si hay gente en el living */
             bytesLeidos = fifoLivingLec.leer( static_cast<void*>(buffer), 1);
             if (bytesLeidos > 0) {
@@ -72,7 +75,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
             }
             /* Escribimos el id de la mesa y la cantidad de ocupantes */
             std::string mensaje = "";
-            mensaje = std::to_string(idMesa) + "-" + count_s;
+            mensaje = ProcesoMesasManager::serializarIdMesa(idMesa) + "-" + count_s;
             fifoNuevosComensalesEnMesa.escribir(static_cast<const void*>(mensaje.c_str()), TAM_MAX_MSJ_RECP_PCM);
         } else {
             /* Como no hay mesas disponibles, las personas que lleguen pasarán al living */

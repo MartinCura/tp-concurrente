@@ -101,7 +101,7 @@ AccionMozo ProcesoMozo::esperarAccion(std::vector<FifoLectura> fifos) {
 
 void ProcesoMozo::recibirNuevoPedido(FifoLectura fifoNuevosPedidos, FifoEscritura fifoACocinar) {
     try {
-        char buffer[TAM_PEDIDO+1];
+        char buffer[TAM_PEDIDO+1] = "";
         ssize_t bytesLeidos = fifoNuevosPedidos.leer( static_cast<void*>(buffer),TAM_PEDIDO );
         if (bytesLeidos > 0) {
             std::string mensaje = buffer;
@@ -122,7 +122,7 @@ void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
 }
 
 void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
-    char buffer[TAM_PEDIDO+1];
+    char buffer[TAM_PEDIDO+1] = "";
 
     // NO bloquea si todavía no hay pedidos para entregar
     ssize_t bytesLeidos = fifo.leer( static_cast<void*>(buffer),TAM_PEDIDO );
@@ -141,7 +141,7 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
 void ProcesoMozo::entregarPedido(Pedido pedido) {
     //int numMesaPedido = pedido.getNumMesa();
     //pid_t pid = pedido.getPid();
-    //pedido.serializar();
+    pedido.serializar();
     // TODO
 }
 
