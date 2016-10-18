@@ -15,10 +15,11 @@
 class ProcesoComensales : public Proceso {
 private:
     int id_Mesa;
+    int count;
     int ejecutarMiTarea();
 
 public:
-    ProcesoComensales(int idMesa);
+    ProcesoComensales(int idMesa, int count);
 
     ~ProcesoComensales();
 };

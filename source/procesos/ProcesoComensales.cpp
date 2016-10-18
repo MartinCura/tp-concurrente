@@ -7,8 +7,9 @@
 
 #include "../../include/procesos/ProcesoComensales.h"
 
-ProcesoComensales::ProcesoComensales(int id_Mesa) : Proceso() {
+ProcesoComensales::ProcesoComensales(int id_Mesa, int count) : Proceso() {
     this->id_Mesa = id_Mesa;
+    this->count = count;
 }
 
 int ProcesoComensales::ejecutarMiTarea() {
@@ -37,8 +38,8 @@ int ProcesoComensales::ejecutarMiTarea() {
     SignalHandler::destruir();
     sigterm_handler.eliminarSemaforo();
     fifoNuevosPedidos.cerrar();
-    //fifoNuevosPedidos.eliminar();
-    Logger::log("INFO", COMN, getpid(), "Proceso de comensales finalizado.");
+    //fifoNuevosPedidos.eliminar(); Dejar comentado...porque deja procesos sueltos
+    Logger::log("INFO", COMN, getpid(), "Comensales retirándose del restaurante.");
     return 0;
 }
 

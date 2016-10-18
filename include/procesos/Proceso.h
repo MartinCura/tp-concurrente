@@ -28,6 +28,7 @@ class Proceso {
 protected:
     pid_t pid;
     bool stopped;
+    bool _finished;
 //    std::vector<Semaforo> _semaforos;
 
     virtual int ejecutarMiTarea() = 0;
@@ -38,6 +39,8 @@ public:
 //    void addSemaphore(int id, Semaforo& sem);
 
     bool isStopped();
+
+    bool finished();
 
     void start();
 

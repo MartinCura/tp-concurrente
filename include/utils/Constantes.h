@@ -22,10 +22,16 @@
 #define GCOM    "GCOM"
 #define PMM_    "PMM_"
 #define COMN    "COMN"
+#define PCM_    "PCM_"
+#define TERM    "TERM"
 
 static const int MAX_COMENSALES_EN_GRUPO = 5;
 
+static const int TAM_MAX_MSJ_RECP_PCM = 5;
+
 static const std::string ARCHIVO_FIFO_NUEVOS_PEDIDOS  = "/tmp/fifo_nuevos_pedidos";
+
+static const std::string ARCHIVO_FIFO_NUEVOS_COMENSALES_EN_MESA = "/tmp/fifo_nuevos_comensales_en_mesa";
 
 static const std::string ARCHIVO_FIFO_COCINAR  = "/tmp/fifo_cocinar";
 static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";

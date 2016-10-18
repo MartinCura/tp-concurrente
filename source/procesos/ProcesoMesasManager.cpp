@@ -15,8 +15,8 @@ void ProcesoMesasManager::lanzarMesasDisponiblesIniciales(FifoEscritura fifo) {
     for (unsigned i = 0; i < cantMesas; i++) {
         std::string let = std::to_string(i);
         fifo.escribir(static_cast<const void*>(let.c_str()), 2);
-        Logger::log("INFO", PMM_, getpid(), "Todas las mesas fueron inicializadas...");
     }
+    Logger::log("INFO", PMM_, getpid(), "Todas las mesas fueron inicializadas...");
 }
 
 int ProcesoMesasManager::ejecutarMiTarea() {

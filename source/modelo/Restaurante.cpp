@@ -15,6 +15,8 @@ Restaurante::Restaurante() {
 
     iniciarCaja();
 
+    comensalesManager = new ProcesoComensalesManager();
+
     mesasManager = new ProcesoMesasManager(cantMesas);
 
     generadorComensales = new ProcesoGeneradorComensales();
@@ -32,6 +34,8 @@ Restaurante::Restaurante() {
 }
 
 void Restaurante::lanzarProcesos() {
+    comensalesManager->start();
+
     mesasManager->start();
 
     generadorComensales->start();
@@ -46,6 +50,11 @@ void Restaurante::lanzarProcesos() {
 }
 
 void Restaurante::terminarProcesos() {
+    if (comensalesManager->isStopped())
+        comensalesManager->continue_();
+    comensalesManager->interrupt_();
+    comensalesManager->wait_();
+
     if (mesasManager->isStopped())
         mesasManager->continue_();
     mesasManager->interrupt_();
@@ -108,7 +117,8 @@ void Restaurante::run() {
 
         Logger::log("INFO", REST, getpid(), "Cerrando Restorrente...");
     } catch (ProcesoTerminadoException &p) {
-        std::cout << "["<< p.pid <<"] Terminado." << std::endl;
+        //std::cout << "["<< p.pid <<"] Terminado." << std::endl;
+        Logger::log("INFO", TERM, p.pid, "El proceso [" + std::to_string(p.pid) + "] terminó correctamente.");
     }
 }
 
@@ -139,6 +149,9 @@ void Restaurante::procesarCorteDeLuz() {
         /* Detenemos los procesos */
         generadorComensales->stop_();
 
+        comensalesManager->reset();
+        comensalesManager->stop_();
+
         for (unsigned i = 0; i < recepcionistas.size(); i++)
             recepcionistas[i]->stop_();
 
@@ -148,8 +161,7 @@ void Restaurante::procesarCorteDeLuz() {
         cocinero->stop_();
 
         mesasManager->reset();
-
-
+        mesasManager->stop_();
 
         hay_luz = false;
     }
@@ -163,6 +175,8 @@ void Restaurante::procesarVueltaDeLuz() {
         /* Reanudamos los procesos */
         generadorComensales->continue_();
 
+        comensalesManager->continue_();
+
         for (unsigned i = 0; i < recepcionistas.size(); i++)
             recepcionistas[i]->continue_();
 
@@ -170,6 +184,8 @@ void Restaurante::procesarVueltaDeLuz() {
             mozos[i]->continue_();
 
         cocinero->continue_();
+
+        mesasManager->continue_();
 
         hay_luz = true;
     }
@@ -237,6 +253,9 @@ void Restaurante::reset() {
 }
 
 Restaurante::~Restaurante() {
+    if (comensalesManager != 0)
+        delete comensalesManager;
+
     if (mesasManager != 0)
         delete mesasManager;
 
