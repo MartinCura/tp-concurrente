@@ -43,7 +43,6 @@ int Proceso::wait_() {
 
 int Proceso::stop_() {
     stopped = true;
-    //signal(pid, SIGUSR1); TODO: FALTA ENVIARLA
     return kill(pid, SIGSTOP);
 }
 

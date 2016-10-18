@@ -121,6 +121,11 @@ std::string ProcesoMesasManager::serializarIdMesa(int id_mesa) {
     return oss.str();
 }
 
+int ProcesoMesasManager::stop_() {
+    //signal(pid, SIGUSR1); TODO: FALTA ENVIARLA
+    return Proceso::stop_();
+}
+
 ProcesoMesasManager::~ProcesoMesasManager() {
 
 }
