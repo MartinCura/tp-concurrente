@@ -158,7 +158,7 @@ void ProcesoMozo::contabilizarPedido(Pedido pedido){
 
     std::string mensaje = pedido.serializar();
     fifoSaldosMesa.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
-    Logger::log("INFO", MOZO, getpid(), "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a Cocinero.");
+    Logger::log("INFO", MOZO, getpid(), "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a PMM.");
 }
 
 ProcesoMozo::~ProcesoMozo() {
