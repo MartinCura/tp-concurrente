@@ -20,9 +20,9 @@ class Restaurante {
 private:
     bool running;
     bool hay_luz;
-    int cantRecepcionistas,
-        cantMozos,
-        cantMesas;
+    unsigned cantRecepcionistas,
+             cantMozos,
+             cantMesas;
     std::list<Plato> listPlatos;
 
     ProcesoComensalesManager* comensalesManager;

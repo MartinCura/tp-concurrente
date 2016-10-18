@@ -5,7 +5,6 @@
  *      Author: emanuel
  */
 
-#include <procesos/ProcesoMesasManager.h>
 #include "../../include/procesos/ProcesoComensales.h"
 
 ProcesoComensales::ProcesoComensales(int id_Mesa, int count) : Proceso() {
@@ -35,7 +34,7 @@ int ProcesoComensales::ejecutarMiTarea() {
         Logger::log("INFO", COMN, getpid(), "Llegó nuestro pedido. Comiendo...");
         comer(pedido);
 
-        if (generarRandom(2) % 2 == 0) {
+        if (Utils::generarRandom(2) % 2 == 0) {
             std::ostringstream oss;
             oss << "HAGO OTRO PEDIDO mesa: " << this->id_mesa << " getpid: " << getpid() << std::endl;//
             Logger::log("DEBG", COMN, getpid(), oss.str());

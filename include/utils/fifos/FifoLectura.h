@@ -10,7 +10,7 @@ public:
 
 	void abrir();
 	void abrir(bool bloqueante);
-	ssize_t leer(void* buffer,const ssize_t buffsize) const;
+	ssize_t leer(void* buffer,const size_t buffsize) const;
 };
 
 #endif /* FIFOLECTURA_H_ */

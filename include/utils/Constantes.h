@@ -64,8 +64,8 @@ static const int TAM_CANT_PLATO = 2; // Orden máxima de un cierto plato por Ped
 static const int TAM_PID = 5;        // pid máximo = 32768, innecesario chequearlo
 
 // Esto es lo más feo que programé en mucho tiempo jaja
-static const int TAM_PEDIDO = (TAM_PID + 1) + (TAM_NUM_MESA + 1) + (TAM_CANT_PLATO + 1) * 100 + 1;
-                            //     pid      ;    núm_mesa     ;      cant, ... ,cant,          \n
+static const size_t TAM_PEDIDO = (TAM_PID + 1) + (TAM_NUM_MESA + 1) + (TAM_CANT_PLATO + 1) * 100 + 1;
+                               //     pid      ;    núm_mesa     ;      cant, ... ,cant,          \n
 
 
 #endif //TP_CONCURRENTE_CONSTANTES_H

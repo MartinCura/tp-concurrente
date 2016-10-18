@@ -158,6 +158,8 @@ void Restaurante::procesarCorteDeLuz() {
 
         cocinero->stop_();
 
+        // TODO: ESTE LLAMADO VA A FUNCIONAR SOBRE EL PROCESO INCORRECTO, UN SIGNAL TIENE QUE ENVIARSE Y mesasManager
+        // TODO: EN SU PROPIO PROCESO DEBE CORRER RESET()
         mesasManager->reset();
         mesasManager->stop_();
 
@@ -248,10 +250,10 @@ void Restaurante::agregarPerdida(int cant) {
 }
 
 
-void Restaurante::reset() {
-    // Registrar comida entregada pero no pagada como pérdida
-    // Cocinero, mozos, recepcionista olvidan lo que estaban haciendo (se resetean)
-}
+//void Restaurante::reset() {
+//    // Registrar comida entregada pero no pagada como pérdida
+//    // Cocinero, mozos, recepcionista olvidan lo que estaban haciendo (se resetean)
+//}
 
 Restaurante::~Restaurante() {
     if (comensalesManager != 0)

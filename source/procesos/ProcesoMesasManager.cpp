@@ -6,7 +6,7 @@
 #include <modelo/ObjetosDeRestaurante.h>
 #include <modelo/Restaurante.h>
 
-ProcesoMesasManager::ProcesoMesasManager(int cantMesas) : Proceso() {
+ProcesoMesasManager::ProcesoMesasManager(unsigned cantMesas) : Proceso() {
     this->cantMesas = cantMesas;
     for (unsigned i = 0; i < cantMesas; ++i) {
         struct Mesa m(i);
@@ -36,7 +36,7 @@ int ProcesoMesasManager::ejecutarMiTarea() {
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
-    char buffer[TAM_NUM_MESA+1];
+    char buffer[TAM_NUM_MESA+1] = "";
     //ssize_t bytesLeidos = 0;
 
     while (!sigint_handler.getGracefulQuit()) {
@@ -72,6 +72,8 @@ int ProcesoMesasManager::ejecutarMiTarea() {
 }
 
 void ProcesoMesasManager::reset() {
+    // TODO: Correrlo desde el process correcto
+    // TODO: Podría hacer algo como if (getpid() != getPID()) enviar un signal a getPID()...?
     for (unsigned i = 0; i < this->cantMesas; ++i) {
         if (vMesas[i].gastado > 0)
             Restaurante::agregarPerdida(vMesas[i].gastado);
@@ -90,4 +92,5 @@ std::string ProcesoMesasManager::serializarIdMesa(int id_mesa) {
 }
 
 ProcesoMesasManager::~ProcesoMesasManager() {
+
 }

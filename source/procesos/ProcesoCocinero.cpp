@@ -26,7 +26,7 @@ int ProcesoCocinero::ejecutarMiTarea() {
     FifoEscritura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
 
-    char buffer[TAM_PEDIDO + 1];
+    char buffer[TAM_PEDIDO + 1] = "";
 
     while (!sigint_handler.getGracefulQuit()) {
         sleep(3);

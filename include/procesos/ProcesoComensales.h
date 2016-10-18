@@ -11,6 +11,8 @@
 #include "Proceso.h"
 #include "../modelo/Pedido.h"
 #include "../utils/Utils.h"
+#include <procesos/ProcesoMesasManager.h>
+
 
 class ProcesoComensales : public Proceso {
 private:
