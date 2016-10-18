@@ -2,37 +2,23 @@
 // Created by martin on 11/10/16.
 //
 
-
+#include <utils/Constantes.h>
 #include "../../include/modelo/Pedido.h"
 
 
-/*
- * No estoy seguro cómo se hace el envío para que sepan cuánto sacar, por lo que hago mensajes
- * de tamaño prefijado, decidiendo la cantidad de dígitos del número de mesa y de la cantidad de platos
- * Número de mesa está entre 000 y 999 mientras que se puede pedir entre 00 y 99 de un plato en un Pedido.
- * TODO: Ajustar este mensaje para la entrega.
-*/
-int CANT_PLATOS = 100;  // Platos distintos disponibles
-int TAM_NUM_MESA = 3;   // Mesas disponibles = 10^TAM_NUM_MESA
-int TAM_CANT_PLATO = 2; // Orden máxima de un cierto plato por Pedido = 10^TAM_CANT_PLATO
-
-// Esto es lo más feo que programé en mucho tiempo jaja
-int Pedido::TAM_MENSAJE = (TAM_NUM_MESA + 1) + (TAM_CANT_PLATO + 1) * 100 + 1;
-                        //  núm_mesa      ;      cant, ... ,cant,          \n
-
-
-Pedido::Pedido(int numMesa) {
+Pedido::Pedido(int numMesa, pid_t unPid) {
     if (numMesa < 0 || numMesa >= pow(10, TAM_NUM_MESA))
         throw std::invalid_argument( "argumento inválido" );
 
-    for (int i = 0; i < CANT_PLATOS; ++i) {
+    for (int i = 0; i < CANT_PLATOS_DISTINTOS; ++i) {
         scorecard[i] = 0;
     }
     this->num_mesa = numMesa;
+    this->pid = unPid;
 }
 
 void Pedido::agregarPlato(int numPlato, int cant) {
-    if (numPlato < 0 || numPlato > CANT_PLATOS || cant < 0)
+    if (numPlato < 0 || numPlato > CANT_PLATOS_DISTINTOS || cant < 0)
         throw std::invalid_argument( "argumento inválido" );
 
     int maxCantPlatos = (int) pow(10, TAM_CANT_PLATO) - 1;
@@ -41,28 +27,38 @@ void Pedido::agregarPlato(int numPlato, int cant) {
         this->scorecard[numPlato] = maxCantPlatos;
 }
 
+pid_t Pedido::getPid() {
+    return this->pid;
+}
+
 int Pedido::getNumMesa() {
     return this->num_mesa;
 }
 
 unsigned int Pedido::cantPlatos() {
     unsigned int sum = 0;
-    for (int i = 0; i < CANT_PLATOS; ++i) {
+    for (int i = 0; i < CANT_PLATOS_DISTINTOS; ++i) {
         sum += scorecard[i];
     }
     return sum;
 }
 
 
+// Formato: `pid;numMesa;cantPlato0,cantPlato1,cantPlato2,...,cantPlatoMax,\n`
 std::string Pedido::serializar() {
     std::ostringstream oss;
 
-    // Normaliza número a la cantidad de dígitos correcta para el serial, el primer 1 salva caso borde
+    // Los for normalizan número a la cantidad de dígitos correcta para el serial, el primer 1 salva caso borde = 0
+    pid_t pid = getpid();
+    for (int z = pid; z < pow(10, TAM_PID - 1); z *= 10) {
+        oss << 0;
+    }
+    oss << pid << ";";
     for (int z = num_mesa > 0 ? num_mesa : 1 ; z < pow(10, TAM_NUM_MESA - 1); z *= 10) {
         oss << 0;
     }
     oss << num_mesa << ";";
-    for (int i = 0; i < CANT_PLATOS; ++i) {
+    for (int i = 0; i < CANT_PLATOS_DISTINTOS; ++i) {
         int cant = this->scorecard[i];
         for (int z = cant > 0 ? cant : 1; z < pow(10, TAM_CANT_PLATO - 1); z *= 10) {
             oss << 0;
@@ -75,14 +71,17 @@ std::string Pedido::serializar() {
 
 Pedido Pedido::deserializar(std::string str_serializado) {
     std::stringstream ss(str_serializado);
-    int numMesa;
+    int pid, numMesa;
 
-    ss >> numMesa;
-    Pedido pedido(numMesa);
-
+    ss >> pid;
     ss.ignore();
 
-    for (int i = 0; i < CANT_PLATOS; ++i) {
+    ss >> numMesa;
+    ss.ignore();
+
+    Pedido pedido(numMesa, pid);
+
+    for (int i = 0; i < CANT_PLATOS_DISTINTOS; ++i) {
         ss >> pedido.scorecard[i];
         ss.ignore();
     }

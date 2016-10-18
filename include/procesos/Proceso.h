@@ -16,7 +16,6 @@
 #include "../handlers/SignalHandler.h"
 #include "../excepciones/Exceptions.h"
 #include "../utils/Logger.h"
-//#include "../utils/Semaforo.h"
 #include "../utils/Constantes.h"
 #include "../utils/fifos/FifoLectura.h"
 #include "../utils/fifos/FifoEscritura.h"

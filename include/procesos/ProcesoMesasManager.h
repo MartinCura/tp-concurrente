@@ -10,7 +10,8 @@
 
 class ProcesoMesasManager : public Proceso {
 private:
-    int cantMesas;
+    int cantMesas = 1;
+    std::vector<struct Mesa> vMesas;
 
     int ejecutarMiTarea();
     void lanzarMesasDisponiblesIniciales(FifoEscritura fifo);
@@ -19,6 +20,8 @@ public:
     ProcesoMesasManager(int cantMesas);
     void reset();
     ~ProcesoMesasManager();
+
+    static std::string serializarIdMesa(int num_mesa);
 };
 
 

@@ -10,6 +10,7 @@
 
 #include "Proceso.h"
 #include "../modelo/Pedido.h"
+#include "../utils/Constantes.h"
 
 enum AccionMozo {
     NADA,

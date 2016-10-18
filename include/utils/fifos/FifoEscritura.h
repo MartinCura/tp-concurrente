@@ -9,6 +9,7 @@ public:
 	~FifoEscritura();
 
 	void abrir();
+	void abrir(bool bloqueante);
 	ssize_t escribir(const void* buffer,const ssize_t buffsize) const;
 };
 

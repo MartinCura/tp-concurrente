@@ -14,8 +14,9 @@
 
 class ProcesoComensales : public Proceso {
 private:
-    int id_Mesa;
+    int id_mesa;
     int ejecutarMiTarea();
+    void comer(Pedido pedido);
 
 public:
     ProcesoComensales(int idMesa);

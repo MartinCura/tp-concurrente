@@ -13,12 +13,6 @@ ProcesoCocinero::ProcesoCocinero() : Proceso() {
 int ProcesoCocinero::ejecutarMiTarea() {
     Logger::log("INFO", CHEF, getpid(), "Cocinero esperando pedidos.");
 
-    if (BUFFSIZE < Pedido::TAM_MENSAJE + 1) {
-        perror("BUFFSIZE muy chico");
-        exit(1);
-    }
-    char buffer[BUFFSIZE];
-
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
@@ -32,11 +26,13 @@ int ProcesoCocinero::ejecutarMiTarea() {
     FifoEscritura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
 
+    char buffer[TAM_PEDIDO + 1];
+
     while (!sigint_handler.getGracefulQuit()) {
         sleep(3);
 
         // Bloquea si todavía no hay más pedidos para cocinar
-        ssize_t bytesLeidos = fifoACocinar.leer( static_cast<void*>(buffer),Pedido::TAM_MENSAJE );
+        ssize_t bytesLeidos = fifoACocinar.leer( static_cast<void*>(buffer),TAM_PEDIDO );
         if (bytesLeidos > 0) {
             Logger::log("INFO", CHEF, getpid(), "Recibiendo un nuevo pedido.");
             std::string mensaje = buffer;

@@ -15,11 +15,6 @@ ProcesoMozo::ProcesoMozo() : Proceso() {
 int ProcesoMozo::ejecutarMiTarea() {
     Logger::log("INFO", MOZO, getpid(), "Mozo esperando a atender...");
 
-    if (BUFFSIZE < Pedido::TAM_MENSAJE + 1) {
-        perror("BUFFSIZE muy chico");
-        exit(1);
-    }
-
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
@@ -32,14 +27,13 @@ int ProcesoMozo::ejecutarMiTarea() {
     // Se bloquea hasta que aparezca el cocinero
     FifoLectura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
-    //// Marco como non-blocking para que no retenga la atención del mozo cuando no hay cosas esperando
-    //fifoCocinado.setBlocking(false);
+
     FifoLectura fifoNuevosPedidos(ARCHIVO_FIFO_NUEVOS_PEDIDOS);
     fifoNuevosPedidos.abrir();
 
-    std::vector<FifoLectura> fifos;
-    fifos.push_back(fifoCocinado);
-    fifos.push_back(fifoNuevosPedidos);
+    std::vector<FifoLectura> vectorFifos;
+    vectorFifos.push_back(fifoCocinado);
+    vectorFifos.push_back(fifoNuevosPedidos);
 
     //recibirNuevoPedido(fifoACocinar);//
     Restaurante::agregarGanancia(100);// TEST
@@ -48,7 +42,7 @@ int ProcesoMozo::ejecutarMiTarea() {
     while (!sigint_handler.getGracefulQuit()){
         sleep(2);
 
-        AccionMozo accion = esperarAccion(fifos);
+        AccionMozo accion = esperarAccion(vectorFifos);
         switch (accion) {
             case ENTREGAR_PEDIDO:
                 recibirPedidosListos( fifoCocinado );
@@ -80,7 +74,7 @@ AccionMozo ProcesoMozo::esperarAccion(std::vector<FifoLectura> fifos) {
     *           Posición 0: fifo para los nuevos pedidos.
     *           Posición 1: fifo para los pedidos cocinados.
     */
-    AccionMozo acciones[2] = {ENTREGAR_PEDIDO, TOMAR_PEDIDO}; // horrible
+    AccionMozo acciones[2] = { ENTREGAR_PEDIDO, TOMAR_PEDIDO }; // horrible
     struct pollfd fds[fifos.size()];
     for (unsigned i = 0; i < fifos.size(); i++) {
         fds[i] = {fifos[i].getfd(), POLLIN};
@@ -107,9 +101,8 @@ AccionMozo ProcesoMozo::esperarAccion(std::vector<FifoLectura> fifos) {
 
 void ProcesoMozo::recibirNuevoPedido(FifoLectura fifoNuevosPedidos, FifoEscritura fifoACocinar) {
     try {
-        //Pedido pedido(10);// Pedido de grupo de comensales TODO HARDCODE
-        char buffer[BUFFSIZE];
-        ssize_t bytesLeidos = fifoNuevosPedidos.leer( static_cast<void*>(buffer),Pedido::TAM_MENSAJE );
+        char buffer[TAM_PEDIDO+1];
+        ssize_t bytesLeidos = fifoNuevosPedidos.leer( static_cast<void*>(buffer),TAM_PEDIDO );
         if (bytesLeidos > 0) {
             std::string mensaje = buffer;
             mensaje.resize( (unsigned long) bytesLeidos );
@@ -129,10 +122,10 @@ void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
 }
 
 void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
-    char buffer[BUFFSIZE];
+    char buffer[TAM_PEDIDO+1];
 
     // NO bloquea si todavía no hay pedidos para entregar
-    ssize_t bytesLeidos = fifo.leer( static_cast<void*>(buffer),Pedido::TAM_MENSAJE );
+    ssize_t bytesLeidos = fifo.leer( static_cast<void*>(buffer),TAM_PEDIDO );
 
     if (bytesLeidos > 0) {
         std::string mensajeDePedido = buffer;
@@ -146,8 +139,8 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
 }
 
 void ProcesoMozo::entregarPedido(Pedido pedido) {
-    int numMesaPedido = pedido.getNumMesa();
-
+    //int numMesaPedido = pedido.getNumMesa();
+    //pid_t pid = pedido.getPid();
     //pedido.serializar();
     // TODO
 }

@@ -28,24 +28,32 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     FifoEscritura fifoLivingEsc(ARCHIVO_FIFO_LIVING_COM);
     fifoLivingEsc.abrir();
 
-    char buffer[BUFFSIZE];
+    // oh dios demasiadas fifos
+
+    char buffer[TAM_NUM_MESA+1];
+
     while (!sigint_handler.getGracefulQuit()){
-        int id_Mesa = -1;
-        ssize_t bytesLeidos = fifoMesasLibres.leer( static_cast<void*>(buffer), 2);
+
+        int idMesa = -1;
+        ssize_t bytesLeidos = fifoMesasLibres.leer( static_cast<void*>(buffer),TAM_NUM_MESA );
         if (bytesLeidos > 0) {
+            std::ostringstream oss;//
+            oss << "PR leí en fifoMesasLibres: `" << buffer << "`" << std::endl;//
+            Logger::log("DEBG", RECP, getpid(), oss.str());//
+
             std::string msg = buffer;
-            msg.resize(bytesLeidos);
-            id_Mesa = atoi(msg.c_str());
-            //Logger::log("INFO", RECP, getpid(), "Mesa disponible con id : " + std::to_string(id_Mesa) + ".");
+            msg.resize( (unsigned long) bytesLeidos );
+            idMesa = atoi(msg.c_str());
+            //Logger::log("INFO", RECP, getpid(), "Mesa disponible con id : " + std::to_string(idMesa) + ".");
         }
 
-        if (id_Mesa > -1) {
+        if (idMesa > -1) {
             /* Vemos si hay gente en el living */
             bytesLeidos = fifoLivingLec.leer( static_cast<void*>(buffer), 1);
             if (bytesLeidos > 0) {
                 std::string mensaje = buffer;
                 mensaje.resize ( (unsigned long) bytesLeidos );
-                Logger::log("INFO", RECP, getpid(), "Sacando comensales (" + mensaje + ") del living y ubicando en la mesa " + std::to_string(id_Mesa) + ".");
+                Logger::log("INFO", RECP, getpid(), "Sacando comensales (" + mensaje + ") del living y ubicando en la mesa " + std::to_string(idMesa) + ".");
             } else {
                 /* Si no hay gente en el living esperamos en la entrada */
                 // Bloquea si todavía no hay más pedidos para cocinar
@@ -53,13 +61,14 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 if (bytesLeidos > 0) {
                     std::string mensaje = buffer;
                     mensaje.resize ( (unsigned long) bytesLeidos );
-                    Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(id_Mesa) + ".");
+                    Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(idMesa) + ".");
                 }
             }
-            ProcesoComensales* proc = new ProcesoComensales(id_Mesa);
+            ProcesoComensales* proc = new ProcesoComensales(idMesa);
             comensales.push_back(proc);
             try {
                 proc->start();
+
             } catch (ProcesoTerminadoException &p) {
                 SignalHandler::destruir();
                 fifoLlegadaCom.cerrar();

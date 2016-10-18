@@ -10,6 +10,13 @@ void FifoEscritura::abrir() {
 	fd = open ( nombre.c_str(),O_WRONLY );
 }
 
+void FifoEscritura::abrir(bool bloqueante) {
+	if (bloqueante)
+		abrir();
+	else
+		fd = open ( nombre.c_str(),O_WRONLY|O_NONBLOCK );
+}
+
 ssize_t FifoEscritura::escribir(const void* buffer,const ssize_t buffsize) const {
 	return write ( fd,buffer,buffsize );
 }

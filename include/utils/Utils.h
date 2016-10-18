@@ -11,10 +11,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+
 static int generarRandom(int tope) {
     srand((unsigned int) time(0));
-    int result = rand() % tope + 1;
-    return result;
+    return rand() % tope + 1;
 }
 
 static void dormir(int tiempo) {
