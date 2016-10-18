@@ -139,10 +139,26 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
 }
 
 void ProcesoMozo::entregarPedido(Pedido pedido) {
-    //int numMesaPedido = pedido.getNumMesa();
-    //pid_t pid = pedido.getPid();
+    contabilizarPedido(pedido);
+
     pedido.serializar();
     // TODO
+}
+
+
+/**
+ * Metodo que pasa al PMM usando un FIFO para sumar el costo del pedido a la mesa.
+ * @param pedido
+ */
+void ProcesoMozo::contabilizarPedido(Pedido pedido){
+
+    // Abro fifo de escritura para pasar pedidos al PMM
+    FifoEscritura fifoSaldosMesa ( ARCHIVO_FIFO_SALDOS_MESA );
+    fifoSaldosMesa.abrir();
+
+    std::string mensaje = pedido.serializar();
+    fifoSaldosMesa.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
+    Logger::log("INFO", MOZO, getpid(), "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a Cocinero.");
 }
 
 ProcesoMozo::~ProcesoMozo() {

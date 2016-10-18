@@ -40,6 +40,8 @@ static const std::string ARCHIVO_FIFO_COCINADO = "/tmp/fifo_cocinado";
 
 static const std::string ARCHIVO_FIFO_MESAS_LIBRES = "/tmp/fifo_mesas_libres";
 static const std::string ARCHIVO_FIFO_LIBERAR_MESA = "/tmp/fifo_liberar_mesa";
+static const std::string ARCHIVO_FIFO_SALDOS_MESA = "/tmp/fifo_saldos_mesa";
+
 
 static const std::string ARCHIVO_FIFO_LLEGADA_COM = "/tmp/fifo_llegada_com";
 static const std::string ARCHIVO_FIFO_LIVING_COM  = "/tmp/fifo_living_com";

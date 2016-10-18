@@ -58,7 +58,8 @@ int ProcesoMesasManager::ejecutarMiTarea() {
                 fifoMesasLibres.escribir(static_cast<const void*>(msj.c_str()),TAM_NUM_MESA );
             }
         }
-
+        //Proceso costos de los pedidos.
+        sumarizaCostosDePedidos();
     }
     SignalHandler::destruir();
 
@@ -69,6 +70,32 @@ int ProcesoMesasManager::ejecutarMiTarea() {
     fifoRetiradas.eliminar();
     Logger::log("INFO", PMM_, getpid(), "Proceso Mesas Manager finalizado.");
     return 0;
+}
+
+/*
+ * Metodo que toma los pedidos entregados de la FIFO y sumariza sus costos en la mesa correspondiente.
+ */
+void ProcesoMesasManager::sumarizaCostosDePedidos(){
+    // Abro fifo de lectura para tomar actualizar los saldos de la mesa.
+    FifoLectura fifoSaldosMesa( ARCHIVO_FIFO_SALDOS_MESA );
+    fifoSaldosMesa.abrir(false);
+
+    try {
+        char buffer[TAM_PEDIDO+1] = "";
+        ssize_t bytesLeidos = fifoSaldosMesa.leer( static_cast<void*>(buffer),TAM_PEDIDO );
+        if (bytesLeidos > 0) {
+            std::string mensaje = buffer;
+            mensaje.resize( (unsigned long) bytesLeidos );
+            Pedido pedido = Pedido::deserializar(mensaje);
+
+            //TODO: Por ahora todos los platos vales $10.
+            vMesas[pedido.getNumMesa()].gastado += pedido.cantPlatos() * 10;
+
+            Logger::log("INFO", MOZO, getpid(), "Monto del pedido contabilizado en la mesa: " + std::to_string(pedido.getNumMesa()) + ".");
+        }
+    } catch (std::invalid_argument ex) {
+        Logger::log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
+    }
 }
 
 void ProcesoMesasManager::reset() {
