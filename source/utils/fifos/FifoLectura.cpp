@@ -17,6 +17,11 @@ void FifoLectura::abrir(bool bloqueante) {
 		fd = open ( nombre.c_str(),O_RDONLY|O_NONBLOCK );
 }
 
+int FifoLectura::tomarLock() {
+	this->fl.l_type = F_RDLCK;
+	return fcntl ( this->fd,F_SETLKW,&(this->fl) );
+}
+
 ssize_t FifoLectura::leer(void* buffer,const size_t buffsize) const {
 	ssize_t ret;
 	// Si falla y el error no es por estar en no bloqueante...

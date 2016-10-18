@@ -3,6 +3,11 @@
 
 Fifo::Fifo(const std::string nombre) : nombre(nombre), fd(-1) {
 	mknod ( nombre.c_str(),S_IFIFO|0666,0 );
+
+	this->fl.l_type = F_WRLCK;
+	this->fl.l_whence = SEEK_SET;
+	this->fl.l_start = 0;
+	this->fl.l_len = 0;
 }
 
 Fifo::~Fifo() {
@@ -10,6 +15,16 @@ Fifo::~Fifo() {
 
 int Fifo::getfd() {
     return this->fd;
+}
+
+int Fifo::tomarLock() {
+	this->fl.l_type = F_WRLCK;
+	return fcntl ( this->fd,F_SETLKW,&(this->fl) );
+}
+
+int Fifo::liberarLock() {
+	this->fl.l_type = F_UNLCK;
+	return fcntl ( this->fd,F_SETLK,&(this->fl) );
 }
 
 //void Fifo::setBlocking(bool bloqueante) {

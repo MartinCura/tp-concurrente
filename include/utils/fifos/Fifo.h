@@ -13,6 +13,8 @@ public:
 	virtual ~Fifo();
 	virtual void abrir() = 0;
 	int getfd();
+	int tomarLock();
+	int liberarLock();
 //	void setBlocking(bool);
 	void cerrar();
 	void eliminar() const;
@@ -20,6 +22,7 @@ public:
 protected:
 	std::string nombre;
 	int fd;
+	struct flock fl;
 };
 
 #endif /* FIFO_H_ */

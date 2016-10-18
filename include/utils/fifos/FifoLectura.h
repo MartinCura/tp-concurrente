@@ -10,6 +10,8 @@ public:
 
 	void abrir();
 	void abrir(bool bloqueante);
+	int tomarLock();
+
 	ssize_t leer(void* buffer,const size_t buffsize) const;
 };
 
