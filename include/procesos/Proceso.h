@@ -55,7 +55,7 @@ public:
     // Tranqui...la idea es que lo use sólo Restaurante.
     pid_t getPID();
 
-    ~Proceso();
+    virtual ~Proceso();
 };
 
 #endif //TP_CONCURRENTE_PROCESO_H

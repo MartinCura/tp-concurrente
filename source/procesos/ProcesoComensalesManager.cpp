@@ -27,8 +27,8 @@ int ProcesoComensalesManager::ejecutarMiTarea() {
         ssize_t bytesLeidos = fifoNuevosComensalesEnMesa.leer( static_cast<void*>(buffer), TAM_MAX_MSJ_RECP_PCM);
         if (bytesLeidos > 0) {
             std::string msg = buffer;
-            msg.resize(bytesLeidos);
-            std::vector<std::string> param = split(msg, "-");
+            msg.resize((unsigned long) bytesLeidos);
+            std::vector<std::string> param = Utils::split(msg, "-");
             if (param.size() != 2) {// param[0]:id_Mesa; param[1]:count
                 Logger::log("ERR", PCM_, getpid(), "Lectura de datos erronea.");
                 continue;

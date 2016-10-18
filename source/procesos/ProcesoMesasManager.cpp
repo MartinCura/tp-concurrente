@@ -6,7 +6,7 @@
 #include <modelo/ObjetosDeRestaurante.h>
 #include <modelo/Restaurante.h>
 
-ProcesoMesasManager::ProcesoMesasManager(int cantMesas) : Proceso() {
+ProcesoMesasManager::ProcesoMesasManager(unsigned cantMesas) : Proceso() {
     this->cantMesas = cantMesas;
     for (unsigned i = 0; i < cantMesas; ++i) {
         struct Mesa m(i);
@@ -86,4 +86,5 @@ std::string ProcesoMesasManager::serializarIdMesa(int id_mesa) {
 }
 
 ProcesoMesasManager::~ProcesoMesasManager() {
+
 }
