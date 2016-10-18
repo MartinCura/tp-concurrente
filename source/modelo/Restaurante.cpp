@@ -50,21 +50,6 @@ void Restaurante::lanzarProcesos() {
 }
 
 void Restaurante::terminarProcesos() {
-    if (comensalesManager->isStopped())
-        comensalesManager->continue_();
-    comensalesManager->interrupt_();
-    comensalesManager->wait_();
-
-    if (mesasManager->isStopped())
-        mesasManager->continue_();
-    mesasManager->interrupt_();
-    mesasManager->wait_();
-
-    if (generadorComensales->isStopped())
-        generadorComensales->continue_();
-    generadorComensales->interrupt_();
-    generadorComensales->wait_();
-
     for (unsigned i = 0; i < recepcionistas.size(); i++) {
         Proceso* proc = recepcionistas[i];
         if (proc->isStopped())
@@ -81,16 +66,30 @@ void Restaurante::terminarProcesos() {
         //proc->wait_();  // TODO podría no hacerlo acá???
     }
 
-    if (cocinero->isStopped())
-        cocinero->continue_();
-    cocinero->interrupt_();
-
     for (unsigned i = 0; i < recepcionistas.size(); i++)
         recepcionistas[i]->wait_();
 
     for (unsigned i = 0; i < mozos.size(); i++)
         mozos[i]->wait_();
 
+    if (comensalesManager->isStopped())
+        comensalesManager->continue_();
+    comensalesManager->interrupt_();
+    comensalesManager->wait_();
+
+    if (mesasManager->isStopped())
+        mesasManager->continue_();
+    mesasManager->interrupt_();
+    mesasManager->wait_();
+
+    if (generadorComensales->isStopped())
+        generadorComensales->continue_();
+    generadorComensales->interrupt_();
+    generadorComensales->wait_();
+
+    if (cocinero->isStopped())
+        cocinero->continue_();
+    cocinero->interrupt_();
     cocinero->wait_();
 }
 
@@ -117,7 +116,6 @@ void Restaurante::run() {
 
         Logger::log("INFO", REST, getpid(), "Cerrando Restorrente...");
     } catch (ProcesoTerminadoException &p) {
-        //std::cout << "["<< p.pid <<"] Terminado." << std::endl;
         Logger::log("INFO", TERM, p.pid, "El proceso [" + std::to_string(p.pid) + "] terminó correctamente.");
     }
 }

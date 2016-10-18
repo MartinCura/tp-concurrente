@@ -47,7 +47,6 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
             std::string msg = buffer;
             msg.resize( (unsigned long) bytesLeidos );
             idMesa = atoi(msg.c_str());
-            //Logger::log("INFO", RECP, getpid(), "Mesa disponible con id : " + std::to_string(idMesa) + ".");
         }
 
         if (idMesa > -1) {
@@ -87,17 +86,18 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
         }
     }
     SignalHandler::destruir();
-    Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
+
     fifoLlegadaCom.cerrar();
-    fifoLlegadaCom.eliminar();
+//    fifoLlegadaCom.eliminar(); //Este eliminar se hace en ProcesoGeneradorComensales
     fifoMesasLibres.cerrar();
-    fifoMesasLibres.eliminar();
+//    fifoMesasLibres.eliminar();
     fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
-    fifoLivingEsc.eliminar();
+    //fifoLivingEsc.eliminar();
     fifoLivingLec.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
-    fifoLivingLec.eliminar();
+    //fifoLivingLec.eliminar();
     fifoNuevosComensalesEnMesa.cerrar();
-    fifoNuevosComensalesEnMesa.eliminar();
+//    fifoNuevosComensalesEnMesa.eliminar(); //Este eliminar se hace en ProcesoComensalesManager
+    Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
     return 0;
 }
 

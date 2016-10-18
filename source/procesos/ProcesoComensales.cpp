@@ -53,6 +53,7 @@ int ProcesoComensales::ejecutarMiTarea() {
             // Escribe su id de mesa al fifo correspondiente para que PMM la libere
             std::string msj = ProcesoMesasManager::serializarIdMesa(this->id_mesa);
             fifoRetirarse.escribir( static_cast<const void*>(msj.c_str()),TAM_NUM_MESA );
+            fifoRetirarse.cerrar();
             break;
         }
         break;

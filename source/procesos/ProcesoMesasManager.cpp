@@ -61,9 +61,13 @@ int ProcesoMesasManager::ejecutarMiTarea() {
 
     }
     SignalHandler::destruir();
-    Logger::log("INFO", PMM_, getpid(), "Proceso Mesas Manager finalizado.");
+
     fifoMesasLibres.cerrar();
     fifoMesasLibres.eliminar();
+
+    fifoRetiradas.cerrar();
+    fifoRetiradas.eliminar();
+    Logger::log("INFO", PMM_, getpid(), "Proceso Mesas Manager finalizado.");
     return 0;
 }
 

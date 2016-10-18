@@ -30,7 +30,7 @@ int ProcesoComensalesManager::ejecutarMiTarea() {
             msg.resize(bytesLeidos);
             std::vector<std::string> param = split(msg, "-");
             if (param.size() != 2) {// param[0]:id_Mesa; param[1]:count
-                Logger::log("ERR", PCM_, getpid(), "Lectura de datos erronea.");
+                Logger::log("ERR ", PCM_, getpid(), "Lectura de datos erronea.");
                 continue;
             }
             int id_Mesa = atoi(param[0].c_str());
@@ -49,9 +49,10 @@ int ProcesoComensalesManager::ejecutarMiTarea() {
         }
     }
     SignalHandler::destruir();
-    Logger::log("INFO", PCM_, getpid(), "Proceso Comensales Manager finalizado.");
+
     fifoNuevosComensalesEnMesa.cerrar();
     fifoNuevosComensalesEnMesa.eliminar();
+    Logger::log("INFO", PCM_, getpid(), "Proceso Comensales Manager finalizado.");
     return 0;
 }
 

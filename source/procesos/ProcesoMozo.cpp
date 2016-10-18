@@ -56,13 +56,13 @@ int ProcesoMozo::ejecutarMiTarea() {
     }
 
     fifoACocinar.cerrar();
-    fifoACocinar.eliminar();
+    //fifoACocinar.eliminar(); //Este eliminar se hace en ProcesoCocinero
 
     fifoCocinado.cerrar();
-    fifoCocinado.eliminar();
+    //fifoCocinado.eliminar(); //Este eliminar se hace en ProcesoCocinero
 
     fifoNuevosPedidos.cerrar();
-    fifoNuevosPedidos.eliminar();
+//    fifoNuevosPedidos.eliminar();
 
     SignalHandler::destruir();
     Logger::log("INFO", MOZO, getpid(), "Proceso Mozo finalizado.");
