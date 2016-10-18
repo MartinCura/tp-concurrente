@@ -5,6 +5,7 @@
 #include <utils/MemoriaCompartida.h>
 #include <modelo/ObjetosDeRestaurante.h>
 #include <modelo/Restaurante.h>
+#include <handlers/SIGUSR1_Handler.h>
 
 ProcesoMesasManager::ProcesoMesasManager(unsigned cantMesas) : Proceso() {
     this->cantMesas = cantMesas;
@@ -35,6 +36,9 @@ int ProcesoMesasManager::ejecutarMiTarea() {
 
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
+
+    SIGUSR1_Handler sigusr1_handler(this);
+    SignalHandler::getInstance()->registrarHandler(SIGUSR1, &sigusr1_handler);
 
     char buffer[TAM_NUM_MESA+1] = "";
     //ssize_t bytesLeidos = 0;
@@ -99,13 +103,12 @@ void ProcesoMesasManager::sumarizaCostosDePedidos(){
 }
 
 void ProcesoMesasManager::reset() {
-    // TODO: Correrlo desde el process correcto
-    // TODO: Podría hacer algo como if (getpid() != getPID()) enviar un signal a getPID()...?
     for (unsigned i = 0; i < this->cantMesas; ++i) {
         if (vMesas[i].gastado > 0)
             Restaurante::agregarPerdida(vMesas[i].gastado);
         vMesas[i].reset();
     }
+    // TODO: VERIFICAR FUNCIONAMIENTO
 }
 
 std::string ProcesoMesasManager::serializarIdMesa(int id_mesa) {
