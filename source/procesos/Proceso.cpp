@@ -10,6 +10,11 @@
 Proceso::Proceso() {
     pid = 0;
     stopped = true;
+    _finished = false;
+}
+
+bool Proceso::finished() {
+    return _finished;
 }
 
 bool Proceso::isStopped() {
@@ -21,6 +26,7 @@ void Proceso::start() {
     pid_t id = fork();
     if (id == 0) {
         ejecutarMiTarea();
+        _finished = true;
         throw ProcesoTerminadoException(getpid());
     } else {
         pid = id;

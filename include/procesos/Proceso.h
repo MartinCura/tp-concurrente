@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <vector>
 #include "../handlers/SIGINT_Handler.h"
 #include "../handlers/SIGTERM_Handler.h"
 #include "../handlers/SignalHandler.h"
@@ -19,7 +20,6 @@
 #include "../utils/Constantes.h"
 #include "../utils/fifos/FifoLectura.h"
 #include "../utils/fifos/FifoEscritura.h"
-#include <vector>
 
 static const int BUFFSIZE = 400;
 
@@ -27,6 +27,7 @@ class Proceso {
 protected:
     pid_t pid;
     bool stopped;
+    bool _finished;
 //    std::vector<Semaforo> _semaforos;
 
     virtual int ejecutarMiTarea() = 0;
@@ -37,6 +38,8 @@ public:
 //    void addSemaphore(int id, Semaforo& sem);
 
     bool isStopped();
+
+    bool finished();
 
     void start();
 

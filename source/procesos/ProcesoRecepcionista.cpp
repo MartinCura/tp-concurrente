@@ -28,6 +28,9 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     FifoEscritura fifoLivingEsc(ARCHIVO_FIFO_LIVING_COM);
     fifoLivingEsc.abrir();
 
+    FifoEscritura fifoNuevosComensalesEnMesa(ARCHIVO_FIFO_NUEVOS_COMENSALES_EN_MESA);
+    fifoNuevosComensalesEnMesa.abrir();
+
     // oh dios demasiadas fifos
 
     char buffer[TAM_NUM_MESA+1];
@@ -48,11 +51,13 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
         }
 
         if (idMesa > -1) {
+            std::string count_s = "";
             /* Vemos si hay gente en el living */
             bytesLeidos = fifoLivingLec.leer( static_cast<void*>(buffer), 1);
             if (bytesLeidos > 0) {
                 std::string mensaje = buffer;
                 mensaje.resize ( (unsigned long) bytesLeidos );
+                count_s = mensaje;
                 Logger::log("INFO", RECP, getpid(), "Sacando comensales (" + mensaje + ") del living y ubicando en la mesa " + std::to_string(idMesa) + ".");
             } else {
                 /* Si no hay gente en el living esperamos en la entrada */
@@ -61,23 +66,14 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 if (bytesLeidos > 0) {
                     std::string mensaje = buffer;
                     mensaje.resize ( (unsigned long) bytesLeidos );
+                    count_s = mensaje;
                     Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(idMesa) + ".");
                 }
             }
-            ProcesoComensales* proc = new ProcesoComensales(idMesa);
-            comensales.push_back(proc);
-            try {
-                proc->start();
-
-            } catch (ProcesoTerminadoException &p) {
-                SignalHandler::destruir();
-                fifoLlegadaCom.cerrar();
-                fifoMesasLibres.cerrar();
-                fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
-                fifoLivingLec.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
-                Logger::log("INFO", COMN, getpid(), "Comensales retirándose del restaurante.");
-                throw ProcesoTerminadoException(p.pid);
-            }
+            /* Escribimos el id de la mesa y la cantidad de ocupantes */
+            std::string mensaje = "";
+            mensaje = std::to_string(idMesa) + "-" + count_s;
+            fifoNuevosComensalesEnMesa.escribir(static_cast<const void*>(mensaje.c_str()), TAM_MAX_MSJ_RECP_PCM);
         } else {
             /* Como no hay mesas disponibles, las personas que lleguen pasarán al living */
             // Bloquea si todavía no hay más pedidos para cocinar
@@ -93,17 +89,17 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     SignalHandler::destruir();
     Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
     fifoLlegadaCom.cerrar();
-    //fifoLlegadaCom.eliminar();
+    fifoLlegadaCom.eliminar();
     fifoMesasLibres.cerrar();
-    //fifoMesasLibres.eliminar();
+    fifoMesasLibres.eliminar();
     fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
     fifoLivingEsc.eliminar();
     fifoLivingLec.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
     fifoLivingLec.eliminar();
+    fifoNuevosComensalesEnMesa.cerrar();
+    fifoNuevosComensalesEnMesa.eliminar();
     return 0;
 }
 
 ProcesoRecepcionista::~ProcesoRecepcionista() {
-    for (unsigned i = 0; i < comensales.size(); i++)
-        delete comensales[i];
 }
