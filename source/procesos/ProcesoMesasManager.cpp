@@ -51,22 +51,23 @@ int ProcesoMesasManager::ejecutarMiTarea() {
 
         // Si encuentra una mesa que liberar, manda a caja lo gastado en ella y la libera
         if ((/*bytesLeidos = */fifoRetiradas.leer( static_cast<void*>(buffer),TAM_NUM_MESA )) > 0 ) {
-            std::ostringstream oss;//
-            oss << "PMM leí en fifoRetiradas: `" << buffer << "`" << std::endl;//
-            Logger::log("DEBG", PMM_, getpid(), oss.str());//
-
             std::stringstream ss(buffer);
             int numMesa = -1;
             ss >> numMesa;
             if (numMesa >= 0) {
+                Logger::log("INFO", PMM_, getpid(),
+                            "Libero la mesa " + std::to_string(numMesa)
+                            + " (gastado " + std::to_string(vMesas[numMesa].gastado) + " $).");
+
                 Restaurante::agregarGanancia(vMesas[numMesa].gastado);
-                vMesas[numMesa].gastado = 0;
                 vMesas[numMesa].ocupada = false;
+                vMesas[numMesa].gastado = 0;
+
                 std::string msj = serializarIdMesa(numMesa);
-                fifoMesasLibres.escribir(static_cast<const void*>(msj.c_str()),TAM_NUM_MESA );
+                fifoMesasLibres.escribir( static_cast<const void*>(msj.c_str()),TAM_NUM_MESA );
             }
         }
-        //Proceso costos de los pedidos.
+        // Proceso costos de los pedidos.
         registrarPedidoEnUnaMesa(fifoSaldosMesa);
     }
     SignalHandler::destruir();
@@ -94,23 +95,33 @@ void ProcesoMesasManager::registrarPedidoEnUnaMesa(FifoLectura fifoSaldosMesa) {
             Pedido pedido = Pedido::deserializar(mensaje);
 
             //TODO: Por ahora todos los platos valen $10.
-            vMesas[pedido.getNumMesa()].gastado += pedido.cantPlatos() * 10;
+            unsigned costoPedido = pedido.cantPlatos() * 10;
+            vMesas[pedido.getNumMesa()].gastado += costoPedido;
 
-            Logger::log("INFO", MOZO, getpid(),
-                        "Monto del pedido contabilizado en la mesa: " + std::to_string(pedido.getNumMesa()) + ".");
+            Logger::log("INFO", PMM_, getpid(),
+                        "Registro pedido en mesa: " + std::to_string(pedido.getNumMesa())
+                        + " como " + std::to_string(costoPedido) + " $.");
         }
     } catch (std::invalid_argument ex) {
-        Logger::log("ERR", MOZO, getpid(), "Pasé un argumento inválido a creación de pedido");
+        Logger::log("ERR", PMM_, getpid(), "Pasé un argumento inválido a creación de pedido");
     }
 }
 
+// TODO: VERIFICAR FUNCIONAMIENTO
 void ProcesoMesasManager::reset() {
+    Logger::log("INFO", PMM_, getpid(), "Todas las mesas se liberan.");
+    unsigned sumaPerdido = 0;
     for (unsigned i = 0; i < this->cantMesas; ++i) {
         if (vMesas[i].gastado > 0)
-            Restaurante::agregarPerdida(vMesas[i].gastado);
+            sumaPerdido += vMesas[i].gastado;
         vMesas[i].reset();
     }
-    // TODO: VERIFICAR FUNCIONAMIENTO
+    if (sumaPerdido > 0) {
+        Logger::log("INFO", PMM_, getpid(), "Se registra una pérdida de " + std::to_string(sumaPerdido) + ".");
+        Restaurante::agregarPerdida(sumaPerdido);
+    } else {
+        Logger::log("INFO", PMM_, getpid(), "No se registró pérdida.");
+    }
 }
 
 std::string ProcesoMesasManager::serializarIdMesa(int id_mesa) {
@@ -123,8 +134,9 @@ std::string ProcesoMesasManager::serializarIdMesa(int id_mesa) {
     return oss.str();
 }
 
-int ProcesoMesasManager::stop_() {
-    //signal(pid, SIGUSR1); TODO: FALTA ENVIARLA
+int ProcesoMesasManager::stop__() {
+    Logger::log("DEBG", PMM_, getpid(), "HAGO KILL SIGUSR1 desde pid del Restaurante.");//
+    kill(pid, SIGUSR1);// TODO: VERIFICAR ENVÍO
     return Proceso::stop_();
 }
 

@@ -56,7 +56,8 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 std::string mensaje = buffer;
                 mensaje.resize ( (unsigned long) bytesLeidos );
                 count_s = mensaje;
-                Logger::log("INFO", RECP, getpid(), "Sacando comensales (" + mensaje + ") del living y ubicando en la mesa " + std::to_string(idMesa) + ".");
+                Logger::log("INFO", RECP, getpid(),
+                            "Saco comensales (" + mensaje + ") del living y ubico en mesa " + std::to_string(idMesa) + ".");
             } else {
                 /* Si no hay gente en el living esperamos en la entrada */
                 // Bloquea si todavía no hay más pedidos para cocinar
@@ -65,7 +66,8 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                     std::string mensaje = buffer;
                     mensaje.resize ( (unsigned long) bytesLeidos );
                     count_s = mensaje;
-                    Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(idMesa) + ".");
+                    Logger::log("INFO", RECP, getpid(),
+                                "Ubicando a comensales (" + mensaje + ") en la mesa " + std::to_string(idMesa) + ".");
                 }
             }
             /* Escribimos el id de la mesa y la cantidad de ocupantes */
@@ -83,6 +85,11 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + ") en el living.");
             }
         }
+
+        // Costo temporal de recibir a alguien
+        unsigned tiempoParaRecibir = 3;
+        sleep(tiempoParaRecibir);
+
     }
     SignalHandler::destruir();
 

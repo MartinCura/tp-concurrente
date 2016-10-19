@@ -76,7 +76,6 @@ void Restaurante::terminarProcesos() {
         comensalesManager->continue_();
     comensalesManager->interrupt_();
     comensalesManager->wait_();
-
     if (mesasManager->isStopped())
         mesasManager->continue_();
     mesasManager->interrupt_();
@@ -99,7 +98,8 @@ bool Restaurante::inicializado() {
 
 void Restaurante::run() {
     try {
-        Logger::log("INFO", REST, getpid(), "Iniciando Restorrente...");
+        Logger::log("INFO", REST, getpid(), "-------------------------------------------");
+        Logger::log("INFO", REST, getpid(), "Abriendo Restorrente...");
 
         lanzarProcesos();
 
@@ -114,7 +114,8 @@ void Restaurante::run() {
 
         terminarProcesos();
 
-        Logger::log("INFO", REST, getpid(), "Cerrando Restorrente...");
+        Logger::log("INFO", REST, getpid(), "Cerrando Restorrente.");
+        Logger::log("INFO", REST, getpid(), "-------------------------------------------");
     } catch (ProcesoTerminadoException &p) {
         Logger::log("INFO", TERM, p.pid, "El proceso [" + std::to_string(p.pid) + "] terminó correctamente.");
     }
@@ -140,50 +141,69 @@ void Restaurante::procesarInput(std::string input) {
 }
 
 void Restaurante::procesarCorteDeLuz() {
+
     if (hay_luz) {
-        Logger::log("INFO", REST, getpid(), "Se generó un corte de luz");
-        /* TODO hay que "vaciar" todo (reiniciar) y parar los procesos (SIGSTOP???) hasta que vuelva la luz */
+        pid_t pidCortador = fork();
 
-        /* Detenemos los procesos */
-        generadorComensales->stop_();
+        if (pidCortador < 0)
+            perror("fork() al cortar la luz");
 
-        comensalesManager->reset();
-        comensalesManager->stop_();
+        else if (pidCortador == 0) {
+            Logger::log("INFO", REST, getpid(), "¡Se generó un corte de luz!");
+            Logger::log("INFO", REST, getpid(), "~~~~~");
+            /* TODO hay que "vaciar" todo (reiniciar) y parar los procesos (SIGSTOP???) hasta que vuelva la luz */
 
-        for (unsigned i = 0; i < recepcionistas.size(); i++)
-            recepcionistas[i]->stop_();
+            /* Detenemos los procesos */
+            generadorComensales->stop_();
 
-        for (unsigned i = 0; i < mozos.size(); i++)
-            mozos[i]->stop_();
+            comensalesManager->reset(); // TODO: Cuidado en qué proceso/pid se corre esto, es el del restaurante
+            comensalesManager->stop_();
 
-        cocinero->stop_();
+            for (unsigned i = 0; i < recepcionistas.size(); i++)
+                recepcionistas[i]->stop_();
 
-        mesasManager->stop_();
+            for (unsigned i = 0; i < mozos.size(); i++)
+                mozos[i]->stop_();
 
+            cocinero->stop_();
+
+            mesasManager->stop__();
+
+            exit(0);
+        }
         hay_luz = false;
     }
 }
 
 void Restaurante::procesarVueltaDeLuz() {
+
     if (!hay_luz) {
-        Logger::log("INFO", REST, getpid(), "Se reanudó el suministro de energía");
-        /* TODO hay que reanudar los procesos pero en 0 (fifos vacíos y otras yerbas, etc) (SIGCONT???) */
+        pid_t pidDumbledore = fork();
 
-        /* Reanudamos los procesos */
-        generadorComensales->continue_();
+        if (pidDumbledore < 0)
+            perror("fork() en el trifásico");
 
-        comensalesManager->continue_();
+        else if (pidDumbledore == 0) {
+            Logger::log("INFO", REST, getpid(), "Se reanudó el suministro de energía");
+            /* TODO hay que reanudar los procesos pero en 0 (fifos vacíos y otras yerbas, etc) (SIGCONT???) */
 
-        for (unsigned i = 0; i < recepcionistas.size(); i++)
-            recepcionistas[i]->continue_();
+            /* Reanudamos los procesos */
+            generadorComensales->continue_();
 
-        for (unsigned i = 0; i < mozos.size(); i++)
-            mozos[i]->continue_();
+            comensalesManager->continue_();
 
-        cocinero->continue_();
+            for (unsigned i = 0; i < recepcionistas.size(); i++)
+                recepcionistas[i]->continue_();
 
-        mesasManager->continue_();
+            for (unsigned i = 0; i < mozos.size(); i++)
+                mozos[i]->continue_();
 
+            cocinero->continue_();
+
+            mesasManager->continue_();
+
+            exit(0);
+        }
         hay_luz = true;
     }
 }

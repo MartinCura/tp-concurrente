@@ -90,14 +90,16 @@ Pedido Pedido::deserializar(std::string str_serializado) {
 }
 
 
-// Crea un Pediddo rándom para un comensal, con entre 0 y 4 platos rándom por comensal
+// Crea un Pediddo rándom para un comensal, con entre 0 y 4 platos rándom por comensal, pero nunca vacío
 Pedido Pedido::crearRandom(pid_t pidComensal, unsigned numMesa, unsigned cantComensales) {
     Pedido pedido(numMesa, pidComensal);
     for (unsigned comensal = 0; comensal < cantComensales; ++comensal) {
-        unsigned hambreComensal = Utils::generarRandom(5) - 1;
+        unsigned hambreComensal = (unsigned) Utils::generarRandom(5) - 1;
         for (unsigned plato = 0; plato < hambreComensal; ++plato) {
             pedido.agregarPlato( Utils::generarRandom(CANT_PLATOS_DISTINTOS) );
         }
     }
+    if (pedido.cantPlatos() == 0)
+        pedido.agregarPlato( Utils::generarRandom(CANT_PLATOS_DISTINTOS) );
     return pedido;
 }

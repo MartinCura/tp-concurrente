@@ -29,6 +29,7 @@ public:
 	}
 
 	virtual int handleSignal ( int signum ) {
+		printf("HandleSignal SIGUSR1\n");//
 		assert ( signum == SIGUSR1 );
 		this->pmm->reset();
 		return 0;

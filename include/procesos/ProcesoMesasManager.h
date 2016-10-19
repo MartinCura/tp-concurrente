@@ -19,11 +19,11 @@ private:
 
 public:
     ProcesoMesasManager(unsigned cantMesas);
-    void reset();
+    void reset(); // TODO: Por qué aparece como nunca usado? SIGUSR1_Handler lo usa...
 
     static std::string serializarIdMesa(int num_mesa);
 
-    int stop_();
+    int stop__();
     // TODO: Revisar este warning
 
     ~ProcesoMesasManager();

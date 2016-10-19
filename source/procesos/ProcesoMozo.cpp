@@ -101,7 +101,8 @@ void ProcesoMozo::recibirNuevoPedido(FifoLectura fifoNuevosPedidos, FifoEscritur
             std::string mensaje = buffer;
             mensaje.resize( (unsigned long) bytesLeidos );
             Pedido pedidoRecibido = Pedido::deserializar(mensaje);
-            Logger::log("INFO", MOZO, getpid(), "Pedido recibido de mesa " + std::to_string(pedidoRecibido.getNumMesa()) + ".");
+            Logger::log("INFO", MOZO, getpid(),
+                        "Pedido recibido de mesa " + std::to_string(pedidoRecibido.getNumMesa()) + ".");
             enviarPedidoACocinero( fifoACocinar, pedidoRecibido );
         }
     } catch (std::invalid_argument ex) {
@@ -112,7 +113,8 @@ void ProcesoMozo::recibirNuevoPedido(FifoLectura fifoNuevosPedidos, FifoEscritur
 void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
     fifo.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
-    Logger::log("INFO", MOZO, getpid(), "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a Cocinero.");
+    Logger::log("INFO", MOZO, getpid(),
+                "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a Cocinero.");
 }
 
 void ProcesoMozo::recibirPedidosListos(FifoLectura fifoCocinado, FifoEscritura fifoGastosMesa) {
@@ -147,7 +149,8 @@ void ProcesoMozo::entregarPedido(Pedido pedido, FifoEscritura fifoGastosMesa) {
 void ProcesoMozo::contabilizarPedido(Pedido pedido, FifoEscritura fifoGastosMesa) {
     std::string mensaje = pedido.serializar();
     fifoGastosMesa.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
-    Logger::log("INFO", MOZO, getpid(), "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a PMM.");
+    Logger::log("INFO", MOZO, getpid(),
+                "Mozo registrando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " con PMM.");
 }
 
 ProcesoMozo::~ProcesoMozo() {
