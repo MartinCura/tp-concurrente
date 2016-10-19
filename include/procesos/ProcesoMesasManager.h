@@ -15,7 +15,7 @@ private:
 
     int ejecutarMiTarea();
     void lanzarMesasDisponiblesIniciales(FifoEscritura fifo);
-    void sumarizaCostosDePedidos(FifoLectura);
+    void registrarPedidoEnUnaMesa(FifoLectura);
 
 public:
     ProcesoMesasManager(unsigned cantMesas);

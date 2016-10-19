@@ -24,21 +24,19 @@ int ProcesoComensales::ejecutarMiTarea() {
     fifoNuevosPedidos.abrir();
 
     while (!sigint_handler.getGracefulQuit()) { // está bien esto??
-        Pedido pedido(id_mesa, getpid()); /* TODO debería poder mandarse el id_mesa y el pid de este proceso. */
-        pedido.agregarPlato(1, 1);//
+        Pedido pedido = Pedido::crearRandom(getpid(), this->id_mesa);
+
         std::string mensaje = pedido.serializar();
         fifoNuevosPedidos.escribir( static_cast<const void*>(mensaje.c_str()),TAM_PEDIDO );
         Logger::log("INFO", COMN, getpid(), "Esperando que un mozo tome nuestro pedido.");
+
         //sigterm_handler.executeNext(); /* Se bloquea hasta que le llegue su pedido */
 
         Logger::log("INFO", COMN, getpid(), "Llegó nuestro pedido. Comiendo...");
         comer(pedido);
 
         if (Utils::generarRandom(2) % 2 == 0) {
-            std::ostringstream oss;
-            oss << "HAGO OTRO PEDIDO mesa: " << this->id_mesa << " getpid: " << getpid() << std::endl;//
-            Logger::log("DEBG", COMN, getpid(), oss.str());
-            //hacer otro pedido
+            Logger::log("DEBG", COMN, getpid(), "Mesa " + std::to_string(id_mesa) + " sigue con hambre, pedimos de nuevo.");
 
         } else {
             std::ostringstream oss;
@@ -55,7 +53,6 @@ int ProcesoComensales::ejecutarMiTarea() {
             fifoRetirarse.cerrar();
             break;
         }
-        break;
     }
     SignalHandler::destruir();
     sigterm_handler.eliminarSemaforo();
@@ -66,7 +63,8 @@ int ProcesoComensales::ejecutarMiTarea() {
 }
 
 void ProcesoComensales::comer(Pedido pedido) {
-    sleep(pedido.cantPlatos());
+    unsigned tiempoPorPlato = 1;
+    sleep(pedido.cantPlatos() * tiempoPorPlato);
 }
 
 ProcesoComensales::~ProcesoComensales() {

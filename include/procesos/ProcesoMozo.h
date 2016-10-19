@@ -25,9 +25,9 @@ private:
     AccionMozo esperarAccion(std::vector<FifoLectura> fifos);
     void recibirNuevoPedido(FifoLectura fifoNuevosPedidos, FifoEscritura fifoCocinero);
     void enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido);
-    void recibirPedidosListos(FifoLectura fifo);
-    void entregarPedido(Pedido pedido);
-    void contabilizarPedido(Pedido pedido);
+    void recibirPedidosListos(FifoLectura fifoCocinado, FifoEscritura fifoCostosMesa);
+    void entregarPedido(Pedido pedido, FifoEscritura fifoGastosMesa);
+    void contabilizarPedido(Pedido pedido, FifoEscritura fifoGastosMesa);
 
 public:
     ProcesoMozo();

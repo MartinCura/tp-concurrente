@@ -28,6 +28,8 @@ public:
     std::string serializar();
     static Pedido deserializar(std::string str_serializado);
 
+    static Pedido crearRandom(pid_t pidComensal, unsigned numMesa, unsigned cantComensales = 3);
+
 private:
     // Algún identificador para saber a qué grupo de comensales pertenece
     // TODO: Podría ser el pid_t? Ver dependiendo del IPC usado. Ser consistente con TAM_NUM_MESA

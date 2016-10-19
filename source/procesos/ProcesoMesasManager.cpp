@@ -67,7 +67,7 @@ int ProcesoMesasManager::ejecutarMiTarea() {
             }
         }
         //Proceso costos de los pedidos.
-        sumarizaCostosDePedidos(fifoSaldosMesa);
+        registrarPedidoEnUnaMesa(fifoSaldosMesa);
     }
     SignalHandler::destruir();
 
@@ -81,9 +81,9 @@ int ProcesoMesasManager::ejecutarMiTarea() {
 }
 
 /*
- * Metodo que toma los pedidos entregados de la FIFO y sumariza sus costos en la mesa correspondiente.
+ * Método que toma los pedidos entregados de la FIFO y sumariza sus costos en la mesa correspondiente.
  */
-void ProcesoMesasManager::sumarizaCostosDePedidos(FifoLectura fifoSaldosMesa) {
+void ProcesoMesasManager::registrarPedidoEnUnaMesa(FifoLectura fifoSaldosMesa) {
     try {
         char buffer[TAM_PEDIDO+1] = "";
 

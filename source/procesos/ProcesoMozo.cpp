@@ -18,6 +18,11 @@ int ProcesoMozo::ejecutarMiTarea() {
     SIGINT_Handler sigint_handler;
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
+    // Abro fifo de lectura para nuevos pedidos de comensales
+    // Se bloquea hasta que aparezca algún comensal // TODO creo
+    FifoLectura fifoNuevosPedidos(ARCHIVO_FIFO_NUEVOS_PEDIDOS);
+    fifoNuevosPedidos.abrir();
+
     // Abro fifo de escritura para pedidos al cocinero
     // Se bloquea hasta que aparezca el cocinero
     FifoEscritura fifoACocinar ( ARCHIVO_FIFO_COCINAR );
@@ -28,16 +33,13 @@ int ProcesoMozo::ejecutarMiTarea() {
     FifoLectura fifoCocinado ( ARCHIVO_FIFO_COCINADO );
     fifoCocinado.abrir();
 
-    FifoLectura fifoNuevosPedidos(ARCHIVO_FIFO_NUEVOS_PEDIDOS);
-    fifoNuevosPedidos.abrir();
+    // Abro fifo de escritura para pasar pedidos al PMM
+    FifoEscritura fifoPedidosMesas ( ARCHIVO_FIFO_SALDOS_MESA );
+    fifoPedidosMesas.abrir();
 
     std::vector<FifoLectura> vectorFifos;
     vectorFifos.push_back(fifoCocinado);
     vectorFifos.push_back(fifoNuevosPedidos);
-
-    //recibirNuevoPedido(fifoACocinar);//
-    Restaurante::agregarGanancia(100);// TEST
-    Restaurante::agregarPerdida(7);// TEST
 
     while (!sigint_handler.getGracefulQuit()){
         sleep(2);
@@ -45,24 +47,20 @@ int ProcesoMozo::ejecutarMiTarea() {
         AccionMozo accion = esperarAccion(vectorFifos);
         switch (accion) {
             case ENTREGAR_PEDIDO:
-                recibirPedidosListos( fifoCocinado );
+                recibirPedidosListos( fifoCocinado, fifoPedidosMesas );
                 break;
             case TOMAR_PEDIDO:
-                recibirNuevoPedido(fifoNuevosPedidos, fifoACocinar); //cuando no esté hardcodeado TODO
+                recibirNuevoPedido( fifoNuevosPedidos, fifoACocinar );
                 break;
             default:
                 ;
         }
     }
 
-    fifoACocinar.cerrar();
-    //fifoACocinar.eliminar(); //Este eliminar se hace en ProcesoCocinero
-
-    fifoCocinado.cerrar();
-    //fifoCocinado.eliminar(); //Este eliminar se hace en ProcesoCocinero
-
-    fifoNuevosPedidos.cerrar();
-//    fifoNuevosPedidos.eliminar();
+    fifoACocinar.cerrar();  // Se elimina en ProcesoCocinero
+    fifoCocinado.cerrar();  // Se elimina en ProcesoCocinero
+    fifoNuevosPedidos.cerrar(); // TODO: Dónde se elimina???
+    fifoPedidosMesas.cerrar(); // Se elimina en PMM
 
     SignalHandler::destruir();
     Logger::log("INFO", MOZO, getpid(), "Proceso Mozo finalizado.");
@@ -71,18 +69,19 @@ int ProcesoMozo::ejecutarMiTarea() {
 
 AccionMozo ProcesoMozo::esperarAccion(std::vector<FifoLectura> fifos) {
     /* Suponer:
-    *           Posición 0: fifo para los nuevos pedidos.
-    *           Posición 1: fifo para los pedidos cocinados.
+    *           Posición 0: fifo para los pedidos cocinados.
+    *           Posición 1: fifo para los nuevos pedidos.
     */
-    AccionMozo acciones[2] = { ENTREGAR_PEDIDO, TOMAR_PEDIDO }; // horrible
+    AccionMozo acciones[2] = { ENTREGAR_PEDIDO, TOMAR_PEDIDO };
+
     struct pollfd fds[fifos.size()];
     for (unsigned i = 0; i < fifos.size(); i++) {
         fds[i] = {fifos[i].getfd(), POLLIN};
     }
 
-    nfds_t tamFds = fifos.size(); // Actualizar si se agrega TODO
+    nfds_t tamFds = fifos.size();
 
-    int r = poll(fds, tamFds, 1000);//-1); // TODO Poner un timeout para que salgo o que quede esperando?
+    int r = poll(fds, tamFds, -1); // Sin timeout
 
     if (r < 0 && errno != EINTR)
         perror( "poll()" );
@@ -90,11 +89,6 @@ AccionMozo ProcesoMozo::esperarAccion(std::vector<FifoLectura> fifos) {
         for (unsigned i = 0; i < fifos.size(); i++)
             if (fds[i].revents & POLLIN)
                 return acciones[i];
-        //if (fds[0].revents & POLLIN)
-        //    return ENTREGAR_PEDIDO;
-        //if (fds[1].revents & POLLIN)
-        //    return TOMAR_PEDIDO;
-        // Estar listo para otros TODO
     }
     return NADA;
 }
@@ -121,11 +115,11 @@ void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
     Logger::log("INFO", MOZO, getpid(), "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a Cocinero.");
 }
 
-void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
+void ProcesoMozo::recibirPedidosListos(FifoLectura fifoCocinado, FifoEscritura fifoGastosMesa) {
     char buffer[TAM_PEDIDO+1] = "";
 
     // NO bloquea si todavía no hay pedidos para entregar
-    ssize_t bytesLeidos = fifo.leer( static_cast<void*>(buffer),TAM_PEDIDO );
+    ssize_t bytesLeidos = fifoCocinado.leer( static_cast<void*>(buffer),TAM_PEDIDO );
 
     if (bytesLeidos > 0) {
         std::string mensajeDePedido = buffer;
@@ -133,31 +127,26 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifo) {
 
         Pedido pedidoAEntregar = Pedido::deserializar(mensajeDePedido);
 
-        entregarPedido(pedidoAEntregar);
+        entregarPedido(pedidoAEntregar, fifoGastosMesa);
         Logger::log("INFO", MOZO, getpid(), "Entregó pedido.");
     }
 }
 
-void ProcesoMozo::entregarPedido(Pedido pedido) {
-    contabilizarPedido(pedido);
+void ProcesoMozo::entregarPedido(Pedido pedido, FifoEscritura fifoGastosMesa) {
+    contabilizarPedido(pedido, fifoGastosMesa);
 
     pedido.serializar();
-    // TODO
+    // TODO enviarle al comensal el pedido
 }
 
 
 /**
- * Metodo que pasa al PMM usando un FIFO para sumar el costo del pedido a la mesa.
+ * Método que pasa al PMM usando un FIFO para sumar el costo del pedido a la mesa.
  * @param pedido
  */
-void ProcesoMozo::contabilizarPedido(Pedido pedido){
-
-    // Abro fifo de escritura para pasar pedidos al PMM
-    FifoEscritura fifoSaldosMesa ( ARCHIVO_FIFO_SALDOS_MESA );
-    fifoSaldosMesa.abrir();
-
+void ProcesoMozo::contabilizarPedido(Pedido pedido, FifoEscritura fifoGastosMesa) {
     std::string mensaje = pedido.serializar();
-    fifoSaldosMesa.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
+    fifoGastosMesa.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
     Logger::log("INFO", MOZO, getpid(), "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a PMM.");
 }
 

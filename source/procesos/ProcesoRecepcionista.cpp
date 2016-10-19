@@ -43,10 +43,6 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
 
         bytesLeidos = fifoMesasLibres.leer( static_cast<void*>(buffer),TAM_NUM_MESA );
         if (bytesLeidos > 0) {
-            std::ostringstream oss;//
-            oss << "PR leí en fifoMesasLibres: `" << buffer << "`" << std::endl;//
-            Logger::log("DEBG", RECP, getpid(), oss.str());//
-
             std::string msg = buffer;
             msg.resize( (unsigned long) bytesLeidos );
             idMesa = atoi(msg.c_str());

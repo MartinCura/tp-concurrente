@@ -4,6 +4,7 @@
 
 #include "../../include/utils/Utils.h"
 
+
 int Utils::generarRandom(int tope) {
     srand((unsigned int) time(0));
     return rand() % tope + 1;

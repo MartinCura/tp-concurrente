@@ -3,6 +3,7 @@
 //
 
 #include <utils/Constantes.h>
+#include <utils/Utils.h>
 #include "../../include/modelo/Pedido.h"
 
 
@@ -84,6 +85,19 @@ Pedido Pedido::deserializar(std::string str_serializado) {
     for (int i = 0; i < CANT_PLATOS_DISTINTOS; ++i) {
         ss >> pedido.scorecard[i];
         ss.ignore();
+    }
+    return pedido;
+}
+
+
+// Crea un Pediddo rándom para un comensal, con entre 0 y 4 platos rándom por comensal
+Pedido Pedido::crearRandom(pid_t pidComensal, unsigned numMesa, unsigned cantComensales) {
+    Pedido pedido(numMesa, pidComensal);
+    for (unsigned comensal = 0; comensal < cantComensales; ++comensal) {
+        unsigned hambreComensal = Utils::generarRandom(5) - 1;
+        for (unsigned plato = 0; plato < hambreComensal; ++plato) {
+            pedido.agregarPlato( Utils::generarRandom(CANT_PLATOS_DISTINTOS) );
+        }
     }
     return pedido;
 }
