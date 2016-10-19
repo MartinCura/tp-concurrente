@@ -169,7 +169,8 @@ void Restaurante::procesarCorteDeLuz() {
 
             cocinero->stop_();
 
-            mesasManager->stop__();
+            mesasManager->vaciar();
+            //mesasManager->stop__(); Pruebo no frenarlo total es innecesario
 
             exit(0);
         }
@@ -202,7 +203,7 @@ void Restaurante::procesarVueltaDeLuz() {
 
             cocinero->continue_();
 
-            mesasManager->continue_();
+            //mesasManager->continue_(); No lo continuo porque no lo frené
 
             exit(0);
         }

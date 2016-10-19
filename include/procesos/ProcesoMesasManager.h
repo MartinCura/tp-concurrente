@@ -24,7 +24,7 @@ public:
     static std::string serializarIdMesa(int num_mesa);
 
     int stop__();
-    // TODO: Revisar este warning
+    void vaciar();
 
     ~ProcesoMesasManager();
 };
