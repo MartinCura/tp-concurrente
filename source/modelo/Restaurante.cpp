@@ -114,6 +114,8 @@ void Restaurante::run() {
 
         terminarProcesos();
 
+        Logger::log("INFO", REST, getpid(), "Estado final de la caja");
+        consultarCaja();
         Logger::log("INFO", REST, getpid(), "Cerrando Restorrente.");
         Logger::log("INFO", REST, getpid(), "-------------------------------------------");
     } catch (ProcesoTerminadoException &p) {
@@ -223,11 +225,11 @@ void Restaurante::iniciarCaja() {
 void Restaurante::consultarCaja() {
     struct Caja laCaja = shmCaja.leer();
     std::ostringstream oss;
-    oss << std::endl << "---- Consulta de caja ----"    << std::endl
-                     << "- Ingresado\t Perdido -"       << std::endl
-                     << "- " + std::to_string(laCaja.ingreso) + "\t\t " + std::to_string(laCaja.perdido) + "\t -"
+    oss << std::endl << " ---- Consulta de caja ---- "    << std::endl
+                     << " - Ingresado\t Perdido - "       << std::endl
+                     << " - " + std::to_string(laCaja.ingreso) + "\t\t " + std::to_string(laCaja.perdido) + "\t -"
                                                         << std::endl
-                     << "--------------------------";
+                     << " -------------------------- ";
     std::string output = oss.str();
 
     Logger::log("INFO", REST, getpid(), "comando caja" + output);

@@ -135,8 +135,8 @@ std::string ProcesoMesasManager::serializarIdMesa(int id_mesa) {
 }
 
 int ProcesoMesasManager::stop__() {
-    Logger::log("DEBG", PMM_, getpid(), "HAGO KILL SIGUSR1 desde pid del Restaurante.");//
-    kill(pid, SIGUSR1);// TODO: VERIFICAR ENVÍO
+    //Logger::log("DEBG", PMM_, getpid(), "HAGO KILL SIGUSR1 desde pid del Restaurante.");//
+    kill(pid, SIGUSR1);// TODO: Envío se recibe cuando quiere al parecer...
     return Proceso::stop_();
 }
 

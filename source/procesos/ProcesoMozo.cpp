@@ -114,7 +114,7 @@ void ProcesoMozo::enviarPedidoACocinero(FifoEscritura fifo, Pedido pedido) {
     std::string mensaje = pedido.serializar();
     fifo.escribir( static_cast<const void*>(mensaje.c_str()),mensaje.length() );
     Logger::log("INFO", MOZO, getpid(),
-                "Mozo entregando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a Cocinero.");
+                "Mozo enviando pedido de mesa " + std::to_string(pedido.getNumMesa()) + " a Cocinero.");
 }
 
 void ProcesoMozo::recibirPedidosListos(FifoLectura fifoCocinado, FifoEscritura fifoGastosMesa) {
@@ -130,7 +130,8 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifoCocinado, FifoEscritura f
         Pedido pedidoAEntregar = Pedido::deserializar(mensajeDePedido);
 
         entregarPedido(pedidoAEntregar, fifoGastosMesa);
-        Logger::log("INFO", MOZO, getpid(), "Entregó pedido.");
+        Logger::log("INFO", MOZO, getpid(),
+                    "Entregó pedido a mesa " + std::to_string(pedidoAEntregar.getNumMesa()) + ".");
     }
 }
 
