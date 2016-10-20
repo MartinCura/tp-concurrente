@@ -6,18 +6,29 @@
 #include "../../include/modelo/Restaurante.h"
 
 Restaurante::Restaurante() {
+    cocinero = 0;
+    comensalesManager = 0;
+    mesasManager = 0;
+    generadorComensales = 0;
+
+    cantRecepcionistas = 0;//
+    cantMozos = 0;//
+    cantMesas = 0;//
+
+    setting_ok = false;
+
+    cargarConfiguracion();
+
+    if (!setting_ok)
+        return;
+
     semaforoMesasListas = Semaforo("/bin/grep", 0);
+    semaforoComensales = Semaforo("/bin/ps", 0, cantMesas);
+
     running = true;
     hay_luz = true;
 
-    // TODO: Tomar como input
-    cantRecepcionistas = 2;//
-    cantMozos = 2;//
-    cantMesas = 5;//
-
     iniciarCaja();
-
-    semaforoComensales = Semaforo("/bin/ps", 0, cantMesas);
 
     comensalesManager = new ProcesoComensalesManager(semaforoComensales);
 
@@ -35,6 +46,42 @@ Restaurante::Restaurante() {
 
     /* Creamos el proceso para el cocinero */
     cocinero = new ProcesoCocinero();
+}
+
+void Restaurante::cargarConfiguracion() {
+    std::filebuf in;
+    if (!in.open("conf.json", std::ios::in)) {
+        std::cout << "ERROR: No existe archivo de configuración conf.json" << std::endl;
+        return;
+    }
+
+    std::istream iss(&in);
+
+    std::istreambuf_iterator<char> eos;
+    std::string s(std::istreambuf_iterator<char>(iss), eos);
+    std::string err;
+
+    json11::Json _json = json11::Json::parse(s, err);
+
+    if (!err.empty()) {
+        std::cout << "ERROR: conf.json (format)" << std::endl;
+        in.close();
+        return;
+    }
+
+    if (_json["recepcionistas"].is_null()) return;
+		cantRecepcionistas = _json["recepcionistas"].int_value();
+
+    if (_json["mozos"].is_null()) return;
+		cantMozos = _json["mozos"].int_value();
+
+    if (_json["mesas"].is_null()) return;
+		cantMesas = _json["mesas"].int_value();
+
+    /* TODO Menu, precios, tiempos de cocción ??? */
+
+    setting_ok = true;
+    in.close();
 }
 
 void Restaurante::lanzarProcesos() {
@@ -102,7 +149,7 @@ void Restaurante::terminarProcesos() {
 }
 
 bool Restaurante::inicializado() {
-    return true;    // Si hacemos un arch de config, ver que se cargó bien
+    return setting_ok;
 }
 
 void Restaurante::run() {

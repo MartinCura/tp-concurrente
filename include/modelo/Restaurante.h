@@ -16,12 +16,14 @@
 #include "../procesos/ProcesoComensalesManager.h"
 #include "ObjetosDeRestaurante.h"
 #include "../handlers/Semaforo_Handler.h"
+#include "../utils/json11.hpp"
 
 class Restaurante {
 private:
     Semaforo semaforoMesasListas;
     Semaforo semaforoComensales;
 
+    bool setting_ok;
     bool running;
     bool hay_luz;
     unsigned cantRecepcionistas,
@@ -37,6 +39,8 @@ private:
     Proceso* cocinero;  // no genérico
 
     MemoriaCompartida<Caja> shmCaja;
+
+    void cargarConfiguracion();
 
     void iniciarCaja();
 
