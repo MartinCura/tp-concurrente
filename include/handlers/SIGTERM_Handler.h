@@ -12,19 +12,21 @@
 #include <assert.h>
 
 #include "EventHandler.h"
-#include "../utils/Semaforo.h"
+//#include "../utils/Semaforo.h"
+//#include <iostream>
 
-static const std::string FILENAME = "/bin/ps";
+//static const std::string FILENAME = "/bin/ps";
 
 class SIGTERM_Handler : public EventHandler {
 
 	private:
-		Semaforo semaforo;
-
+		bool availible;
+//		Semaforo semaforo;
 	public:
 
 		SIGTERM_Handler () {
-            semaforo = Semaforo(FILENAME, 0);
+			availible = false;
+			//semaforo = Semaforo(FILENAME, 0);
 		}
 
 		~SIGTERM_Handler () {
@@ -32,16 +34,22 @@ class SIGTERM_Handler : public EventHandler {
 
 		virtual int handleSignal ( int signum ) {
 			assert ( signum == SIGTERM );
-			semaforo.v();
+			//std::cout << "me llegó la señal" << std::endl;
+			//semaforo.v();
+			if (availible)
+				availible = false;
+			else
+				availible = true;
 			return 0;
 		}
 
 		void eliminarSemaforo() {
-			semaforo.eliminar();
+			//semaforo.eliminar();
 		}
 
-		void executeNext() {
-            semaforo.p();
+		bool isAvailible() { //executeNext() {
+			return availible;
+			//semaforo.p();
         }
 };
 

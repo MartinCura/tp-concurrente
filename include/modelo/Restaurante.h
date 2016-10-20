@@ -15,9 +15,11 @@
 #include "../procesos/ProcesoMesasManager.h"
 #include "../procesos/ProcesoComensalesManager.h"
 #include "ObjetosDeRestaurante.h"
+#include "../handlers/Semaforo_Handler.h"
 
 class Restaurante {
 private:
+    Semaforo semaforoMesasListas;
     bool running;
     bool hay_luz;
     unsigned cantRecepcionistas,

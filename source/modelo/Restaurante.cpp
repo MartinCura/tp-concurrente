@@ -6,6 +6,7 @@
 #include "../../include/modelo/Restaurante.h"
 
 Restaurante::Restaurante() {
+    semaforoMesasListas = Semaforo("tp_concurrente", 0);
     running = true;
     hay_luz = true;
 
@@ -17,7 +18,7 @@ Restaurante::Restaurante() {
 
     comensalesManager = new ProcesoComensalesManager();
 
-    mesasManager = new ProcesoMesasManager(cantMesas);
+    mesasManager = new ProcesoMesasManager(cantMesas, semaforoMesasListas);
 
     generadorComensales = new ProcesoGeneradorComensales();
 
@@ -34,8 +35,6 @@ Restaurante::Restaurante() {
 }
 
 void Restaurante::lanzarProcesos() {
-    comensalesManager->start();
-
     mesasManager->start();
 
     generadorComensales->start();
@@ -47,6 +46,10 @@ void Restaurante::lanzarProcesos() {
         mozos[i]->start();
 
     cocinero->start();
+
+    semaforoMesasListas.p();
+    semaforoMesasListas.eliminar();
+    comensalesManager->start();
 }
 
 void Restaurante::terminarProcesos() {
@@ -145,21 +148,22 @@ void Restaurante::procesarInput(std::string input) {
 void Restaurante::procesarCorteDeLuz() {
 
     if (hay_luz) {
-        pid_t pidCortador = fork();
+//        pid_t pidCortador = fork();
 
-        if (pidCortador < 0)
-            perror("fork() al cortar la luz");
+//        if (pidCortador < 0)
+//            perror("fork() al cortar la luz");
 
-        else if (pidCortador == 0) {
-            Logger::log("INFO", REST, getpid(), "¡Se generó un corte de luz!");
-            Logger::log("INFO", REST, getpid(), "~~~~~");
+//        else if (pidCortador == 0) {
+
             /* TODO hay que "vaciar" todo (reiniciar) y parar los procesos (SIGSTOP???) hasta que vuelva la luz */
 
             /* Detenemos los procesos */
+            kill(generadorComensales->getPID(), SIGTERM);
             generadorComensales->stop_();
 
-            comensalesManager->reset(); // TODO: Cuidado en qué proceso/pid se corre esto, es el del restaurante
-            comensalesManager->stop_();
+            //comensalesManager->reset(); // TODO: Cuidado en qué proceso/pid se corre esto, es el del restaurante
+            kill(comensalesManager->getPID(), SIGTERM);
+            //comensalesManager->stop_();
 
             for (unsigned i = 0; i < recepcionistas.size(); i++)
                 recepcionistas[i]->stop_();
@@ -170,10 +174,10 @@ void Restaurante::procesarCorteDeLuz() {
             cocinero->stop_();
 
             mesasManager->vaciar();
-            //mesasManager->stop__(); Pruebo no frenarlo total es innecesario
-
-            exit(0);
-        }
+//            mesasManager->stop__();// Pruebo no frenarlo total es innecesario
+            Logger::log("INFO", REST, getpid(), "~~~~~~~~~~¡SE GENERÓ UN CORTE DE LUZ!~~~~~~~~~~");
+//            exit(0);
+//        }
         hay_luz = false;
     }
 }
@@ -181,16 +185,17 @@ void Restaurante::procesarCorteDeLuz() {
 void Restaurante::procesarVueltaDeLuz() {
 
     if (!hay_luz) {
-        pid_t pidDumbledore = fork();
+//        pid_t pidDumbledore = fork();
 
-        if (pidDumbledore < 0)
-            perror("fork() en el trifásico");
+//        if (pidDumbledore < 0)
+//            perror("fork() en el trifásico");
 
-        else if (pidDumbledore == 0) {
-            Logger::log("INFO", REST, getpid(), "Se reanudó el suministro de energía");
+//        else if (pidDumbledore == 0) {
+            Logger::log("INFO", REST, getpid(), "~~~~~~~~~~¡SE REANUDÓ EL SUMINISTRO DE ENERGÍA!~~~~~~~~~~");
             /* TODO hay que reanudar los procesos pero en 0 (fifos vacíos y otras yerbas, etc) (SIGCONT???) */
 
             /* Reanudamos los procesos */
+            kill(generadorComensales->getPID(), SIGTERM);
             generadorComensales->continue_();
 
             comensalesManager->continue_();
@@ -205,8 +210,8 @@ void Restaurante::procesarVueltaDeLuz() {
 
             //mesasManager->continue_(); No lo continuo porque no lo frené
 
-            exit(0);
-        }
+//            exit(0);
+//        }
         hay_luz = true;
     }
 }

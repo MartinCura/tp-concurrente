@@ -30,7 +30,7 @@ int ProcesoComensales::ejecutarMiTarea() {
 
     Logger::log("INFO", COMN, getpid(), "Sentándonos en la mesa " + std::to_string(id_mesa) + ".");
     // Costo temporal de sentarse
-    sleep(5);
+    sleep(3);
 
     while (!sigint_handler.getGracefulQuit()) { // está bien esto??
         Pedido pedido = Pedido::crearRandom(getpid(), (unsigned) this->id_mesa);
@@ -42,6 +42,16 @@ int ProcesoComensales::ejecutarMiTarea() {
                     + " (mesa " + std::to_string(id_mesa) +").");
 
         //sigterm_handler.executeNext(); /* Se bloquea hasta que le llegue su pedido */
+        while (!sigint_handler.getGracefulQuit() && !sigterm_handler.isAvailible()) {
+            sleep(1);
+        }
+
+        if (sigint_handler.getGracefulQuit()) {
+            Logger::log("INFO", COMN, getpid(), "EHHH...se cortó la luz. Mesa " + std::to_string(id_mesa) + ". Nos vamos sin pagar...");
+            break;
+        }
+        /* reseteamos availible (para que availible sea false) */
+        kill(getpid(), SIGTERM);
 
         Logger::log("INFO", COMN, getpid(), "Llegó nuestro pedido (mesa " + std::to_string(id_mesa) + "). Comiendo...");
         comer(pedido);
