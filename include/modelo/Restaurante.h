@@ -22,6 +22,8 @@ class Restaurante {
 private:
     Semaforo semaforoMesasListas;
     Semaforo semaforoComensales;
+    Semaforo semaforoLiving;
+    Semaforo semaforoCaja;
 
     bool setting_ok;
     bool running;
@@ -39,10 +41,12 @@ private:
     Proceso* cocinero;  // no genérico
 
     MemoriaCompartida<Caja> shmCaja;
+    MemoriaCompartida<int> shm_living;
 
     void cargarConfiguracion();
 
     void iniciarCaja();
+    void iniciarLiving();
 
     void lanzarProcesos();
     void terminarProcesos();
@@ -53,6 +57,7 @@ private:
     void procesarCorteDeLuz();
     void procesarVueltaDeLuz();
     void consultarCaja();
+    void consultarLiving();
 
 public:
     Restaurante();

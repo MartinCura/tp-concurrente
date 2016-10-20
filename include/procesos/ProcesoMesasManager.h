@@ -7,7 +7,6 @@
 
 #include "Proceso.h"
 #include "../utils/MemoriaCompartida.h"
-//#include "../utils/Semaforo.h"
 
 class ProcesoMesasManager : public Proceso {
 private:

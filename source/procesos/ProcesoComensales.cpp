@@ -43,23 +43,14 @@ int ProcesoComensales::ejecutarMiTarea() {
                     + " (mesa " + std::to_string(id_mesa) +").");
         fifoNuevosPedidos.escribir( static_cast<const void*>(mensaje.c_str()),TAM_PEDIDO );
 
-//<<<<<<< HEAD
         try {
             semaforo_handler.executeNext(); /* Se bloquea hasta que le llegue aviso de que su pedido está listo */
             Pedido pedidoRecibido = recibirPedido();
-//=======
-        //sigterm_handler.executeNext(); /* Se bloquea hasta que le llegue su pedido */
-//        while (!sigint_handler.getGracefulQuit() && !sigterm_handler.isAvailible()) {
-//            sleep(1);
-//        }
 
-//        if (sigint_handler.getGracefulQuit()) {
-//            Logger::log("INFO", COMN, getpid(), "EHHH...se cortó la luz. Mesa " + std::to_string(id_mesa) + ". Nos vamos sin pagar...");
-//            break;
-//        }
-        /* reseteamos availible (para que availible sea false) */
-//        kill(getpid(), SIGTERM);
-//>>>>>>> origin/beta
+            if (sigint_handler.getGracefulQuit()) {
+                Logger::log("INFO", COMN, getpid(), "EHHH...se cortó la luz. Mesa " + std::to_string(id_mesa) + ". Nos vamos sin pagar...");
+                break;
+            }
 
             if (pedidoRecibido.getPid() != getpid())
                 throw NoHayPedidoException();

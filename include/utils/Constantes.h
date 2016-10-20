@@ -17,6 +17,7 @@
 #define DEVOLVER_LUZ    "luz"
 #define CONSULTAR_CAJA  "caja"
 #define HELP            "help"
+#define LIVING          "living"
 
 #define MOZO    "MOZO"
 #define CHEF    "CHEF"
@@ -31,6 +32,10 @@
 static const int MAX_COMENSALES_EN_GRUPO = 5;
 
 static const int TAM_MAX_MSJ_RECP_PCM = 5;
+
+static const std::string ARCHIVO_SHM_CAJA = "tp_concurrente";
+static const std::string ARCHIVO_SHM_MESAS = "/bin/bash";
+static const std::string ARCHIVO_SHM_LIVING = "/bin/cp";
 
 static const std::string ARCHIVO_FIFO_NUEVOS_PEDIDOS = "/tmp/fifo_nuevos_pedidos";
 

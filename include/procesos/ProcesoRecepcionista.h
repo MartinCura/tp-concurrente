@@ -14,10 +14,11 @@
 
 class ProcesoRecepcionista : public Proceso {
 private:
+    Semaforo semaforoLiving;
     int ejecutarMiTarea();
 
 public:
-    ProcesoRecepcionista();
+    ProcesoRecepcionista(Semaforo &sem);
 
     ~ProcesoRecepcionista();
 };

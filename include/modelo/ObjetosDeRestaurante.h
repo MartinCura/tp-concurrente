@@ -8,14 +8,9 @@
 #ifndef TP_CONCURRENTE_OBJETOSDERESTAURANTE_H
 #define TP_CONCURRENTE_OBJETOSDERESTAURANTE_H
 
-#include "../utils/Logger.h"
 #include "../modelo/Pedido.h"
 #include "../utils/Constantes.h"
 #include "../excepciones/Exceptions.h"
-
-
-static const std::string ARCHIVO_SHM_CAJA = "tp_concurrente";
-static const std::string ARCHIVO_SHM_MESAS = "/bin/bash";
 
 struct Caja {
     int ingreso = 0;

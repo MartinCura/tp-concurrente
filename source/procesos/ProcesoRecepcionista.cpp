@@ -8,7 +8,8 @@
 #include <procesos/ProcesoMesasManager.h>
 #include "../../include/procesos/ProcesoRecepcionista.h"
 
-ProcesoRecepcionista::ProcesoRecepcionista() : Proceso() {
+ProcesoRecepcionista::ProcesoRecepcionista(Semaforo &sem) : Proceso() {
+    semaforoLiving = sem;
 }
 
 int ProcesoRecepcionista::ejecutarMiTarea() {
@@ -36,6 +37,13 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
 
     char buffer[TAM_NUM_MESA+1] = "";
 
+    MemoriaCompartida<int> shm_living;
+    try {
+        shm_living = MemoriaCompartida<int>(ARCHIVO_SHM_LIVING, 'A');
+    } catch ( std::string& mensaje ) {
+        std::cerr << mensaje << std::endl;
+    }
+
     while (!sigint_handler.getGracefulQuit()){
 
         int idMesa = -1;
@@ -58,6 +66,14 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 count_s = mensaje;
                 Logger::log("INFO", RECP, getpid(),
                             "Saco comensales (" + mensaje + " personas) del living y ubico en mesa " + std::to_string(idMesa) + ".");
+                semaforoLiving.p();
+
+                int cant_personas_en_living = shm_living.leer();
+                int cant_personas_salen_del_living = std::stoi(mensaje);
+                cant_personas_en_living -= cant_personas_salen_del_living;
+                shm_living.escribir(cant_personas_en_living);
+
+                semaforoLiving.v();
             } else {
                 /* Si no hay gente en el living esperamos en la entrada */
                 // Bloquea si todavía no hay más pedidos para cocinar
@@ -83,6 +99,15 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
                 mensaje.resize ( (unsigned long) bytesLeidos );
                 fifoLivingEsc.escribir(static_cast<const void*>(mensaje.c_str()), mensaje.length());
                 Logger::log("INFO", RECP, getpid(), "Ubicando a comensales (" + mensaje + " personas) en el living.");
+
+                semaforoLiving.p();
+
+                int cant_personas_en_living = shm_living.leer();
+                int cant_personas_nuevas = std::stoi(mensaje);
+                cant_personas_en_living += cant_personas_nuevas;
+                shm_living.escribir(cant_personas_en_living);
+
+                semaforoLiving.v();
             }
         }
 
