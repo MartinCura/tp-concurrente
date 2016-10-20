@@ -9,6 +9,7 @@
 #define TP_CONCURRENTE_CONSTANTES_H
 
 #include <string>
+#include <cmath>
 
 /* Ya sé, los nombres son malísimos */
 #define QUIT            "quit"
@@ -64,6 +65,8 @@ static const int CANT_PLATOS_DISTINTOS = 100;  // Platos distintos disponibles
 static const int TAM_NUM_MESA = 3;   // Mesas disponibles = 10^TAM_NUM_MESA
 static const int TAM_CANT_PLATO = 2; // Orden máxima de un cierto plato por Pedido = 10^TAM_CANT_PLATO
 static const int TAM_PID = 5;        // pid máximo = 32768, innecesario chequearlo
+
+static const int MAX_MESAS = pow(10, TAM_NUM_MESA);    // Mesas disponibles: 0 a (CANT_MESAS-1)
 
 // Esto es lo más feo que programé en mucho tiempo jaja
 static const size_t TAM_PEDIDO = (TAM_PID + 1) + (TAM_NUM_MESA + 1) + (TAM_CANT_PLATO + 1) * 100 + 1;

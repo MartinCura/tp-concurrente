@@ -17,6 +17,10 @@ public:
 	ProcesoTerminadoException(pid_t id) : pid(id){}
 };
 
+class NoHayPedidoException : public std::exception {
+public:
+	NoHayPedidoException() {}
+};
 
 
 

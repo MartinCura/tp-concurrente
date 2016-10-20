@@ -44,6 +44,14 @@ int ProcesoMesasManager::ejecutarMiTarea() {
     SIGUSR1_Handler sigusr1_handler(this);
     SignalHandler::getInstance()->registrarHandler(SIGUSR1, &sigusr1_handler);
 
+    MemoriaCompartida<struct MesasConPedidos> shmMesas;
+    try {
+        shmMesas = MemoriaCompartida<struct MesasConPedidos>( ARCHIVO_SHM_MESAS,'A' );
+
+    } catch ( std::string& mensaje ) {
+        std::cerr << mensaje << std::endl;
+    }
+
     char buffer[TAM_NUM_MESA+1] = "";
     //ssize_t bytesLeidos = 0;
 
@@ -77,6 +85,10 @@ int ProcesoMesasManager::ejecutarMiTarea() {
 
     fifoRetiradas.cerrar();
     fifoRetiradas.eliminar();
+
+    // TODO: wait a algo?
+    shmMesas.liberar();
+
     Logger::log("INFO", PMM_, getpid(), "Proceso Mesas Manager finalizado.");
     return 0;
 }
@@ -107,7 +119,6 @@ void ProcesoMesasManager::registrarPedidoEnUnaMesa(FifoLectura fifoSaldosMesa) {
     }
 }
 
-// TODO: VERIFICAR FUNCIONAMIENTO
 void ProcesoMesasManager::reset() {
     Logger::log("INFO", PMM_, getpid(), "Todas las mesas se liberan.");
     unsigned sumaPerdido = 0;

@@ -98,7 +98,7 @@ bool Restaurante::inicializado() {
 
 void Restaurante::run() {
     try {
-        Logger::log("INFO", REST, getpid(), "-------------------------------------------");
+        Logger::log("INFO", REST, getpid(), "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         Logger::log("INFO", REST, getpid(), "Abriendo Restorrente...");
 
         lanzarProcesos();
@@ -117,7 +117,7 @@ void Restaurante::run() {
         Logger::log("INFO", REST, getpid(), "Estado final de la caja");
         consultarCaja();
         Logger::log("INFO", REST, getpid(), "Cerrando Restorrente.");
-        Logger::log("INFO", REST, getpid(), "-------------------------------------------");
+        Logger::log("INFO", REST, getpid(), "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     } catch (ProcesoTerminadoException &p) {
         Logger::log("INFO", TERM, p.pid, "El proceso [" + std::to_string(p.pid) + "] terminó correctamente.");
     }
@@ -151,8 +151,7 @@ void Restaurante::procesarCorteDeLuz() {
             perror("fork() al cortar la luz");
 
         else if (pidCortador == 0) {
-            Logger::log("INFO", REST, getpid(), "¡Se generó un corte de luz!");
-            Logger::log("INFO", REST, getpid(), "~~~~~");
+            Logger::log("INFO", REST, getpid(), "~~~~~ ¡Se generó un corte de luz! ~~~~~");
             /* TODO hay que "vaciar" todo (reiniciar) y parar los procesos (SIGSTOP???) hasta que vuelva la luz */
 
             /* Detenemos los procesos */

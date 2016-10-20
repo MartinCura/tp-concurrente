@@ -17,7 +17,7 @@
 // interfaz Serializable
 class Pedido {
 public:
-    Pedido(int numMesa, pid_t unPid);
+    Pedido(int numMesa = -1, pid_t unPid = -1);
 
     pid_t getPid();
     int getNumMesa();

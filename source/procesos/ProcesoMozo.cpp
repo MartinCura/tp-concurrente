@@ -10,6 +10,7 @@
 #include "../../include/modelo/Restaurante.h"
 
 ProcesoMozo::ProcesoMozo() : Proceso() {
+    shmMesas = MemoriaCompartida<struct MesasConPedidos>( ARCHIVO_SHM_MESAS,'A' );
 }
 
 int ProcesoMozo::ejecutarMiTarea() {
@@ -138,8 +139,13 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifoCocinado, FifoEscritura f
 void ProcesoMozo::entregarPedido(Pedido pedido, FifoEscritura fifoGastosMesa) {
     contabilizarPedido(pedido, fifoGastosMesa);
 
-    pedido.serializar();
-    // TODO enviarle al comensal el pedido
+    // TODO: acá TIENE que haber locks o semáforos por lo menos ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    struct MesasConPedidos mcp =  shmMesas.leer();
+    mcp.put( pedido.getNumMesa(),pedido );
+    shmMesas.escribir( mcp );
+
+    // Notificar al Comensal que su pedido está listo
+    kill( pedido.getPid(),SIGTERM );
 }
 
 

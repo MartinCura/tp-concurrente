@@ -11,6 +11,7 @@
 #include "Proceso.h"
 #include "../modelo/Pedido.h"
 #include "../utils/Utils.h"
+#include <modelo/ObjetosDeRestaurante.h>
 #include <procesos/ProcesoMesasManager.h>
 
 
@@ -19,7 +20,10 @@ private:
     int id_mesa;
     int count;
     int ejecutarMiTarea();
+    Pedido recibirPedido();
     void comer(Pedido pedido);
+
+    MemoriaCompartida<struct MesasConPedidos> shmPedidos;
 
 public:
     ProcesoComensales(int idMesa, int count);

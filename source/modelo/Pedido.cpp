@@ -8,7 +8,7 @@
 
 
 Pedido::Pedido(int numMesa, pid_t unPid) {
-    if (numMesa < 0 || numMesa >= pow(10, TAM_NUM_MESA))
+    if (numMesa < 0 || numMesa >= MAX_MESAS)
         throw std::invalid_argument( "argumento inválido" );
 
     for (int i = 0; i < CANT_PLATOS_DISTINTOS; ++i) {
@@ -50,11 +50,10 @@ std::string Pedido::serializar() {
     std::ostringstream oss;
 
     // Los for normalizan número a la cantidad de dígitos correcta para el serial, el primer 1 salva caso borde = 0
-    pid_t pid = getpid();
-    for (int z = pid; z < pow(10, TAM_PID - 1); z *= 10) {
+    for (int z = this->pid; z < pow(10, TAM_PID - 1); z *= 10) {
         oss << 0;
     }
-    oss << pid << ";";
+    oss << this->pid << ";";
     for (int z = num_mesa > 0 ? num_mesa : 1 ; z < pow(10, TAM_NUM_MESA - 1); z *= 10) {
         oss << 0;
     }

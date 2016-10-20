@@ -11,6 +11,8 @@
 #include "Proceso.h"
 #include "../modelo/Pedido.h"
 #include "../utils/Constantes.h"
+#include "../utils/MemoriaCompartida.h"
+
 
 enum AccionMozo {
     NADA,
@@ -28,6 +30,8 @@ private:
     void recibirPedidosListos(FifoLectura fifoCocinado, FifoEscritura fifoCostosMesa);
     void entregarPedido(Pedido pedido, FifoEscritura fifoGastosMesa);
     void contabilizarPedido(Pedido pedido, FifoEscritura fifoGastosMesa);
+
+    MemoriaCompartida<struct MesasConPedidos> shmMesas;
 
 public:
     ProcesoMozo();
