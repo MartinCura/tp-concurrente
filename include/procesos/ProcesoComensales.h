@@ -19,6 +19,7 @@ class ProcesoComensales : public Proceso {
 private:
     int id_mesa;
     int count;
+    Semaforo semaforoComer;
     int ejecutarMiTarea();
     Pedido recibirPedido();
     void comer(Pedido pedido);
@@ -26,7 +27,7 @@ private:
     MemoriaCompartida<struct MesasConPedidos> shmPedidos;
 
 public:
-    ProcesoComensales(int idMesa, int count);
+    ProcesoComensales(Semaforo &sem, int idMesa, int count);
 
     ~ProcesoComensales();
 };

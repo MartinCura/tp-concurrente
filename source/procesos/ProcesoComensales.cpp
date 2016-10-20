@@ -7,10 +7,10 @@
 
 #include "../../include/procesos/ProcesoComensales.h"
 
-ProcesoComensales::ProcesoComensales(int id_Mesa, int count) : Proceso() {
+ProcesoComensales::ProcesoComensales(Semaforo &sem, int id_Mesa, int count) : Proceso() {
     this->id_mesa = id_Mesa;
     this->count = count;
-
+    semaforoComer = sem;
     shmPedidos = MemoriaCompartida<struct MesasConPedidos>( ARCHIVO_SHM_MESAS,'A' );
 }
 
@@ -18,9 +18,9 @@ int ProcesoComensales::ejecutarMiTarea() {
     Logger::log("INFO", COMN, getpid(), "Iniciando proceso de comensales...");
 
     SIGINT_Handler sigint_handler;
-    SIGTERM_Handler sigterm_handler;
+    Semaforo_Handler semaforo_handler(semaforoComer, id_mesa);
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
-    SignalHandler::getInstance()->registrarHandler(SIGTERM, &sigterm_handler);
+    SignalHandler::getInstance()->registrarHandler(SIGTERM, &semaforo_handler);
 
     FifoEscritura fifoNuevosPedidos( ARCHIVO_FIFO_NUEVOS_PEDIDOS );
     fifoNuevosPedidos.abrir();
@@ -32,7 +32,7 @@ int ProcesoComensales::ejecutarMiTarea() {
 
     Logger::log("INFO", COMN, getpid(), "Sentándonos en la mesa " + std::to_string(id_mesa) + ".");
     // Costo temporal de sentarse
-    sleep(5);
+    sleep(3);
 
     while (!sigint_handler.getGracefulQuit()) { // está bien esto??
         Pedido pedidoAPedir = Pedido::crearRandom(getpid(), (unsigned) this->id_mesa);
@@ -43,9 +43,23 @@ int ProcesoComensales::ejecutarMiTarea() {
                     + " (mesa " + std::to_string(id_mesa) +").");
         fifoNuevosPedidos.escribir( static_cast<const void*>(mensaje.c_str()),TAM_PEDIDO );
 
+//<<<<<<< HEAD
         try {
-            sigterm_handler.executeNext(); /* Se bloquea hasta que le llegue aviso de que su pedido está listo */
+            semaforo_handler.executeNext(); /* Se bloquea hasta que le llegue aviso de que su pedido está listo */
             Pedido pedidoRecibido = recibirPedido();
+//=======
+        //sigterm_handler.executeNext(); /* Se bloquea hasta que le llegue su pedido */
+//        while (!sigint_handler.getGracefulQuit() && !sigterm_handler.isAvailible()) {
+//            sleep(1);
+//        }
+
+//        if (sigint_handler.getGracefulQuit()) {
+//            Logger::log("INFO", COMN, getpid(), "EHHH...se cortó la luz. Mesa " + std::to_string(id_mesa) + ". Nos vamos sin pagar...");
+//            break;
+//        }
+        /* reseteamos availible (para que availible sea false) */
+//        kill(getpid(), SIGTERM);
+//>>>>>>> origin/beta
 
             if (pedidoRecibido.getPid() != getpid())
                 throw NoHayPedidoException();
@@ -74,7 +88,6 @@ int ProcesoComensales::ejecutarMiTarea() {
     }
 
     SignalHandler::destruir();
-    sigterm_handler.eliminarSemaforo();
 
     fifoNuevosPedidos.cerrar();
     fifoRetirarse.cerrar();

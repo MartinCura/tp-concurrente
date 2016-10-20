@@ -43,7 +43,7 @@ int ProcesoMozo::ejecutarMiTarea() {
     vectorFifos.push_back(fifoNuevosPedidos);
 
     while (!sigint_handler.getGracefulQuit()){
-        sleep(2);
+        sleep(1);
 
         AccionMozo accion = esperarAccion(vectorFifos);
         switch (accion) {
@@ -145,7 +145,9 @@ void ProcesoMozo::entregarPedido(Pedido pedido, FifoEscritura fifoGastosMesa) {
     shmMesas.escribir( mcp );
 
     // Notificar al Comensal que su pedido está listo
-    kill( pedido.getPid(),SIGTERM );
+    kill(pedido.getPid(), SIGTERM);
+    pedido.serializar();
+    // TODO enviarle al comensal el pedido
 }
 
 

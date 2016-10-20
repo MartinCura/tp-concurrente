@@ -15,7 +15,7 @@
 
 
 static const std::string ARCHIVO_SHM_CAJA = "tp_concurrente";
-static const std::string ARCHIVO_SHM_MESAS = LOGFILE;
+static const std::string ARCHIVO_SHM_MESAS = "/bin/bash";
 
 struct Caja {
     int ingreso = 0;

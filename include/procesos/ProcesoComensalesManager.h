@@ -12,11 +12,12 @@
 
 class ProcesoComensalesManager : public Proceso {
 private:
+    Semaforo semaforoComensales;
     std::vector<ProcesoComensales*> comensales;
     int ejecutarMiTarea();
 
 public:
-    ProcesoComensalesManager();
+    ProcesoComensalesManager(Semaforo &sem);
 
     void reset();
 

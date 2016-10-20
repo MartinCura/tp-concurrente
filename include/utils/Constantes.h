@@ -47,13 +47,6 @@ static const std::string ARCHIVO_FIFO_SALDOS_MESA = "/tmp/fifo_saldos_mesa";
 static const std::string ARCHIVO_FIFO_LLEGADA_COM = "/tmp/fifo_llegada_com";
 static const std::string ARCHIVO_FIFO_LIVING_COM  = "/tmp/fifo_living_com";
 
-static const std::string FILENAME_SEM_COM_RECP = "../procesos/ProcesoComensales.cpp";
-static const std::string FILENAME_SEM_RECP_COM = "../procesos/ProcesoRecepcionista.cpp";
-
-static const int SEMAFORO_COM_RECP = 1;
-static const int SEMAFORO_RECP_COM = 2;
-
-
 /*
  * Los envíos se hacen prefijando un tamaño máximo para cada dato serializado, 0s ajustándose correspondientemente
  * Número de mesa está entre 000 y 999 mientras que se puede pedir entre 00 y 99 de un plato en un Pedido.

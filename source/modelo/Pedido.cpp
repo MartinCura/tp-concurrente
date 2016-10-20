@@ -50,7 +50,12 @@ std::string Pedido::serializar() {
     std::ostringstream oss;
 
     // Los for normalizan número a la cantidad de dígitos correcta para el serial, el primer 1 salva caso borde = 0
-    for (int z = this->pid; z < pow(10, TAM_PID - 1); z *= 10) {
+//<<<<<<< HEAD
+//    for (int z = this->pid; z < pow(10, TAM_PID - 1); z *= 10) {
+//=======
+    pid_t pid = this->pid;
+    for (int z = pid; z < pow(10, TAM_PID - 1); z *= 10) {
+//>>>>>>> origin/beta
         oss << 0;
     }
     oss << this->pid << ";";

@@ -7,12 +7,13 @@
 #include <modelo/Restaurante.h>
 #include <handlers/SIGUSR1_Handler.h>
 
-ProcesoMesasManager::ProcesoMesasManager(unsigned cantMesas) : Proceso() {
+ProcesoMesasManager::ProcesoMesasManager(unsigned cantMesas, Semaforo &sem) : Proceso() {
     this->cantMesas = cantMesas;
     for (unsigned i = 0; i < cantMesas; ++i) {
         struct Mesa m(i);
         vMesas.push_back(m);
     }
+    semaforoMesasListas = sem;
 }
 
 void ProcesoMesasManager::lanzarMesasDisponiblesIniciales(FifoEscritura fifo) {
@@ -21,6 +22,7 @@ void ProcesoMesasManager::lanzarMesasDisponiblesIniciales(FifoEscritura fifo) {
         fifo.escribir(static_cast<const void*>( strId.c_str()),TAM_NUM_MESA );
     }
     Logger::log("INFO", PMM_, getpid(), "Todas las mesas fueron inicializadas...");
+    semaforoMesasListas.v();
 }
 
 int ProcesoMesasManager::ejecutarMiTarea() {

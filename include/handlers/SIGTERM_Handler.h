@@ -13,19 +13,21 @@
 #include <iostream>
 
 #include "EventHandler.h"
-#include "../utils/Semaforo.h"
-
-static const std::string FILENAME = "/bin/ps";
+//#include "../utils/Semaforo.h"
 
 class SIGTERM_Handler : public EventHandler {
 
 	private:
-		Semaforo semaforo;
+		bool availible;
+//		Semaforo semaforo;
+//		int id_semaforo;
 
 	public:
 
-		SIGTERM_Handler () {
-            semaforo = Semaforo(FILENAME, 0);
+		SIGTERM_Handler (bool value) {//Semaforo &sem, int id_sem) {
+			availible = value;
+//            semaforo = sem;
+//			id_semaforo = id_sem;
 		}
 
 		~SIGTERM_Handler () {
@@ -33,17 +35,20 @@ class SIGTERM_Handler : public EventHandler {
 
 		virtual int handleSignal ( int signum ) {
 			assert ( signum == SIGTERM );
-			semaforo.v();
+			//semaforo.v(id_semaforo);
+			if (availible)
+				availible = false;
+			else
+				availible = true;
 			return 0;
 		}
 
-		void eliminarSemaforo() {
-			semaforo.eliminar();
+		bool isAvailible() {
+			return availible;
 		}
-
-		void executeNext() {
-            semaforo.p();
-        }
+//		void executeNext() {
+//            semaforo.p(id_semaforo);
+//        }
 };
 
 #endif /* SIGTERM_HANDLER_H */

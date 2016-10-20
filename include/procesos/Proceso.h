@@ -20,6 +20,7 @@
 #include "../utils/Constantes.h"
 #include "../utils/fifos/FifoLectura.h"
 #include "../utils/fifos/FifoEscritura.h"
+#include "../handlers/Semaforo_Handler.h"
 
 static const int BUFFSIZE = 400;
 
@@ -28,14 +29,11 @@ protected:
     pid_t pid;
     bool stopped;
     bool _finished;
-//    std::vector<Semaforo> _semaforos;
 
     virtual int ejecutarMiTarea() = 0;
 
 public:
     Proceso();
-
-//    void addSemaphore(int id, Semaforo& sem);
 
     bool isStopped();
 
