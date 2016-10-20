@@ -45,15 +45,12 @@ int ProcesoComensales::ejecutarMiTarea() {
 
         try {
             semaforo_handler.executeNext(); /* Se bloquea hasta que le llegue aviso de que su pedido está listo */
-            Pedido pedidoRecibido = recibirPedido();
 
             if (sigint_handler.getGracefulQuit()) {
                 Logger::log("INFO", COMN, getpid(), "EHHH...se cortó la luz. Mesa " + std::to_string(id_mesa) + ". Nos vamos sin pagar...");
                 break;
             }
-
-            if (pedidoRecibido.getPid() != getpid())
-                throw NoHayPedidoException();
+            Pedido pedidoRecibido = recibirPedido();
 
             Logger::log("INFO", COMN, getpid(),
                         "Llegó nuestro pedido (mesa " + std::to_string(id_mesa) + "). Comiendo...");
