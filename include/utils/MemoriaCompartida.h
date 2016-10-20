@@ -109,7 +109,7 @@ template <class T> MemoriaCompartida<T>::MemoriaCompartida ( const MemoriaCompar
 template <class T> MemoriaCompartida<T>::~MemoriaCompartida () {
 	if (shmId == 0)
 		return;
-		
+
 	int errorDt = shmdt ( static_cast<void*> (this->ptrDatos) );
 
 	if ( errorDt != -1 ) {
@@ -118,7 +118,8 @@ template <class T> MemoriaCompartida<T>::~MemoriaCompartida () {
 			shmctl ( this->shmId,IPC_RMID,NULL );
 		}
 	} else {
-		std::cerr << "[En Destructor] Error en shmdt(): " << strerror(errno) << std::endl;
+		if (errno != EINVAL)
+			perror ( "[En Destructor] Error en shmdt(): " );
 	}
 }
 

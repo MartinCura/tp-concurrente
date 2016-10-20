@@ -110,6 +110,16 @@ void Restaurante::lanzarProcesos() {
 }
 
 void Restaurante::terminarProcesos() {
+    if (generadorComensales->isStopped())
+        generadorComensales->continue_();
+    generadorComensales->interrupt_();
+    generadorComensales->wait_();
+
+    if (cocinero->isStopped())
+        cocinero->continue_();
+    cocinero->interrupt_();
+    cocinero->wait_();
+
     for (unsigned i = 0; i < recepcionistas.size(); i++) {
         Proceso* proc = recepcionistas[i];
         if (proc->isStopped())
@@ -125,6 +135,7 @@ void Restaurante::terminarProcesos() {
         proc->interrupt_();
         //proc->wait_();  // TODO podría no hacerlo acá???
     }
+
 
     for (unsigned i = 0; i < recepcionistas.size(); i++)
         recepcionistas[i]->wait_();
@@ -142,15 +153,7 @@ void Restaurante::terminarProcesos() {
     mesasManager->interrupt_();
     mesasManager->wait_();
 
-    if (generadorComensales->isStopped())
-        generadorComensales->continue_();
-    generadorComensales->interrupt_();
-    generadorComensales->wait_();
 
-    if (cocinero->isStopped())
-        cocinero->continue_();
-    cocinero->interrupt_();
-    cocinero->wait_();
 
     semaforoComensales.eliminar();
     semaforoLiving.eliminar();
@@ -232,6 +235,9 @@ void Restaurante::procesarCorteDeLuz() {
         cocinero->stop_();
 
         mesasManager->vaciar();
+
+        shm_living.escribir(0);
+
 //            mesasManager->stop__();// Pruebo no frenarlo total es innecesario
         Logger::log("INFO", REST, getpid(), "~~~~~~~~~~¡SE GENERÓ UN CORTE DE LUZ!~~~~~~~~~~");
         hay_luz = false;

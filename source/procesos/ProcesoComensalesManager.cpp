@@ -22,25 +22,9 @@ int ProcesoComensalesManager::ejecutarMiTarea() {
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
     SignalHandler::getInstance()->registrarHandler(SIGTERM, &sigterm_handler);
 
-//    kill(getpid(), SIGTERM);
-
     char buffer[BUFFSIZE] = "";
     while (!sigint_handler.getGracefulQuit()){
-/*<<<<<<< HEAD
-        // Lee el id de mesa que fue ocupada y la cantidad de ocupantes
-        ssize_t bytesLeidos = fifoNuevosComensalesEnMesa.leer( static_cast<void*>(buffer), TAM_MAX_MSJ_RECP_PCM);
-        if (bytesLeidos > 0) {
-            std::string msg = buffer;
-            msg.resize((unsigned long) bytesLeidos);
-            std::vector<std::string> param = Utils::split(msg, "-");
-            if (param.size() != 2) {// param[0]:id_Mesa; param[1]:count
-                Logger::log("ERR ", PCM_, getpid(), "Lectura de datos erronea.");
-                continue;
-            }
-            int id_Mesa = atoi(param[0].c_str());
-            int count = atoi(param[1].c_str());
-=======
-*/
+
         if (sigterm_handler.isAvailible()) {
             /* Lee el id de mesa que fue ocupada y la cantidad de ocupantes)*/
             /* TODO podríamos leer la cantidad de personas por grupo. */
@@ -55,7 +39,6 @@ int ProcesoComensalesManager::ejecutarMiTarea() {
                 }
                 int id_Mesa = atoi(param[0].c_str());
                 int count = atoi(param[1].c_str());
-//>>>>>>> origin/beta
 
                 ProcesoComensales* proc = new ProcesoComensales(semaforoComensales, id_Mesa, count);
                 comensales.push_back(proc);

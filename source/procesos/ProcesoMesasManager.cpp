@@ -122,7 +122,6 @@ void ProcesoMesasManager::registrarPedidoEnUnaMesa(FifoLectura fifoSaldosMesa) {
 }
 
 void ProcesoMesasManager::reset() {
-    Logger::log("INFO", PMM_, getpid(), "Todas las mesas se liberan.");
     unsigned sumaPerdido = 0;
     for (unsigned i = 0; i < this->cantMesas; ++i) {
         if (vMesas[i].gastado > 0)
@@ -135,6 +134,7 @@ void ProcesoMesasManager::reset() {
     } else {
         Logger::log("INFO", PMM_, getpid(), "No se registró pérdida.");
     }
+    Logger::log("INFO", PMM_, getpid(), "Todas las mesas se liberan.");
 }
 
 std::string ProcesoMesasManager::serializarIdMesa(int id_mesa) {
