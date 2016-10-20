@@ -51,8 +51,7 @@ public:
 
     int interrupt_();
 
-    // TODO: Cuidado, puede que este método solo funciona para el proceso Restaurante? Usar getpid().
-    // Tranqui...la idea es que lo use sólo Restaurante.
+    /** Solo usar desde Restaurante **/
     pid_t getPID();
 
     virtual ~Proceso();

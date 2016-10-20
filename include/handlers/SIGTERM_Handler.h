@@ -33,7 +33,6 @@ class SIGTERM_Handler : public EventHandler {
 
 		virtual int handleSignal ( int signum ) {
 			assert ( signum == SIGTERM );
-			std::cout << "Libero semáforo" << std::endl;//
 			semaforo.v();
 			return 0;
 		}
@@ -44,7 +43,6 @@ class SIGTERM_Handler : public EventHandler {
 
 		void executeNext() {
             semaforo.p();
-			std::cout << "Soy libre!!!" << std::endl;//
         }
 };
 

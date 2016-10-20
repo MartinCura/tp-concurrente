@@ -9,6 +9,7 @@ Restaurante::Restaurante() {
     running = true;
     hay_luz = true;
 
+    // TODO: Tomar como input
     cantRecepcionistas = 2;//
     cantMozos = 2;//
     cantMesas = 5;//
@@ -93,7 +94,7 @@ void Restaurante::terminarProcesos() {
 }
 
 bool Restaurante::inicializado() {
-    return true;    // útil TODO ver si se carga bien el archivo de configuración
+    return true;    // Si hacemos un arch de config, ver que se cargó bien
 }
 
 void Restaurante::run() {
@@ -152,7 +153,6 @@ void Restaurante::procesarCorteDeLuz() {
 
         else if (pidCortador == 0) {
             Logger::log("INFO", REST, getpid(), "~~~~~ ¡Se generó un corte de luz! ~~~~~");
-            /* TODO hay que "vaciar" todo (reiniciar) y parar los procesos (SIGSTOP???) hasta que vuelva la luz */
 
             /* Detenemos los procesos */
             generadorComensales->stop_();
@@ -187,7 +187,6 @@ void Restaurante::procesarVueltaDeLuz() {
 
         else if (pidDumbledore == 0) {
             Logger::log("INFO", REST, getpid(), "Se reanudó el suministro de energía");
-            /* TODO hay que reanudar los procesos pero en 0 (fifos vacíos y otras yerbas, etc) (SIGCONT???) */
 
             /* Reanudamos los procesos */
             generadorComensales->continue_();
@@ -226,13 +225,13 @@ void Restaurante::consultarCaja() {
     struct Caja laCaja = shmCaja.leer();
     std::ostringstream oss;
     oss << std::endl << " ---- Consulta de caja ---- "    << std::endl
-                     << " - Ingresado\t Perdido - "       << std::endl
-                     << " - " + std::to_string(laCaja.ingreso) + "\t\t " + std::to_string(laCaja.perdido) + "\t -"
+                     << " - Ingresado\t Perdido  - "       << std::endl
+                     << " - " + std::to_string(laCaja.ingreso) + "\t\t " + std::to_string(laCaja.perdido) + "\t  -"
                                                         << std::endl
                      << " -------------------------- ";
     std::string output = oss.str();
 
-    Logger::log("INFO", REST, getpid(), "comando caja" + output);
+    Logger::log("INFO", REST, getpid(), "Revisando la Caja..." + output);
     std::cout << output << std::endl << std::endl;
 }
 
@@ -242,7 +241,7 @@ void Restaurante::agregarGanancia(int cant) {
 
     try {
         MemoriaCompartida<Caja> shmUnaCaja( ARCHIVO_SHM_CAJA,'A' );
-        // TODO Agregar lock? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO Agregar lock? ~~~
         struct Caja laCaja = shmUnaCaja.leer();
         laCaja.ingreso += cant;
         shmUnaCaja.escribir(laCaja);
@@ -258,7 +257,7 @@ void Restaurante::agregarPerdida(int cant) {
 
     try {
         MemoriaCompartida<Caja> shmUnaCaja( ARCHIVO_SHM_CAJA,'A' );
-        // TODO Agregar lock? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO Agregar lock? ~~~
         struct Caja laCaja = shmUnaCaja.leer();
         laCaja.perdido += cant;
         shmUnaCaja.escribir(laCaja);

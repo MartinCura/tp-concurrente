@@ -55,11 +55,9 @@ static const int SEMAFORO_RECP_COM = 2;
 
 
 /*
- * No estoy seguro cómo se hace el envío para que sepan cuánto sacar, por lo que hago mensajes
- * de tamaño prefijado, decidiendo la cantidad de dígitos del número de mesa y de la cantidad de platos
+ * Los envíos se hacen prefijando un tamaño máximo para cada dato serializado, 0s ajustándose correspondientemente
  * Número de mesa está entre 000 y 999 mientras que se puede pedir entre 00 y 99 de un plato en un Pedido.
  * El PID en Ubuntu tiene un máximo de 32768, por lo que permito 5 dígitos ~ mc
- * TODO: Ajustar este mensaje para la entrega.
 */
 static const int CANT_PLATOS_DISTINTOS = 100;  // Platos distintos disponibles
 static const int TAM_NUM_MESA = 3;   // Mesas disponibles = 10^TAM_NUM_MESA
@@ -68,9 +66,10 @@ static const int TAM_PID = 5;        // pid máximo = 32768, innecesario chequea
 
 static const int MAX_MESAS = pow(10, TAM_NUM_MESA);    // Mesas disponibles: 0 a (CANT_MESAS-1)
 
-// Esto es lo más feo que programé en mucho tiempo jaja
+// No es lo maás lindo, pero...
 static const size_t TAM_PEDIDO = (TAM_PID + 1) + (TAM_NUM_MESA + 1) + (TAM_CANT_PLATO + 1) * 100 + 1;
                                //     pid      ;    núm_mesa     ;      cant, ... ,cant,          \n
 
+static const int COSTO_PLATO = 10;  // hardcodeo
 
 #endif //TP_CONCURRENTE_CONSTANTES_H

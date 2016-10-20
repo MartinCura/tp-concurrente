@@ -32,7 +32,7 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     FifoEscritura fifoNuevosComensalesEnMesa(ARCHIVO_FIFO_NUEVOS_COMENSALES_EN_MESA);
     fifoNuevosComensalesEnMesa.abrir();
 
-    // oh dios demasiadas fifos
+    // oh dios demasiados fifos
 
     char buffer[TAM_NUM_MESA+1] = "";
 
@@ -93,16 +93,12 @@ int ProcesoRecepcionista::ejecutarMiTarea() {
     }
     SignalHandler::destruir();
 
-    fifoLlegadaCom.cerrar();
-//    fifoLlegadaCom.eliminar(); //Este eliminar se hace en ProcesoGeneradorComensales
-    fifoMesasLibres.cerrar();
-//    fifoMesasLibres.eliminar();
-    fifoLivingEsc.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
-    //fifoLivingEsc.eliminar();
-    fifoLivingLec.cerrar(); /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
-    //fifoLivingLec.eliminar();
-    fifoNuevosComensalesEnMesa.cerrar();
-//    fifoNuevosComensalesEnMesa.eliminar(); //Este eliminar se hace en ProcesoComensalesManager
+    fifoLlegadaCom.cerrar();    // Este fifo se elimina en ProcesoGeneradorComensales
+    fifoMesasLibres.cerrar();   // TODO: Dónde se elimina?
+    fifoLivingEsc.cerrar();     /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
+    fifoLivingLec.cerrar();     /* TODO debería haber un fifoLivingEsc.eliminar() en algún lado, pero sólo una vez. */
+    fifoNuevosComensalesEnMesa.cerrar();    //Este fifo se elimina en ProcesoComensalesManager
+
     Logger::log("INFO", RECP, getpid(), "Proceso Recepcionista finalizado.");
     return 0;
 }

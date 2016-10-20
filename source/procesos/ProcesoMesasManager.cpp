@@ -106,8 +106,8 @@ void ProcesoMesasManager::registrarPedidoEnUnaMesa(FifoLectura fifoSaldosMesa) {
             mensaje.resize((unsigned long) bytesLeidos);
             Pedido pedido = Pedido::deserializar(mensaje);
 
-            //TODO: Por ahora todos los platos valen $10.
-            unsigned costoPedido = pedido.cantPlatos() * 10;
+            // Por ahora todos los platos valen lo mismo.
+            unsigned costoPedido = pedido.cantPlatos() * COSTO_PLATO;
             vMesas[pedido.getNumMesa()].gastado += costoPedido;
 
             Logger::log("INFO", PMM_, getpid(),
@@ -150,8 +150,7 @@ int ProcesoMesasManager::stop__() {
 }
 
 void ProcesoMesasManager::vaciar() {
-    //Logger::log("DEBG", PMM_, getpid(), "HAGO KILL SIGUSR1 desde pid del Restaurante.");//
-    kill(pid, SIGUSR1);// TODO: Envío se recibe cuando quiere al parecer...
+    kill(pid, SIGUSR1);
 }
 
 ProcesoMesasManager::~ProcesoMesasManager() {

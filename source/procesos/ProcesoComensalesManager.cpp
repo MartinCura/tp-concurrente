@@ -22,8 +22,7 @@ int ProcesoComensalesManager::ejecutarMiTarea() {
 
     char buffer[BUFFSIZE] = "";
     while (!sigint_handler.getGracefulQuit()){
-        /* Lee el id de mesa que fue ocupada y la cantidad de ocupantes)*/
-        /* TODO podríamos leer la cantidad de personas por grupo. */
+        /* Lee el id de mesa que fue ocupada y la cantidad de ocupantes */
         ssize_t bytesLeidos = fifoNuevosComensalesEnMesa.leer( static_cast<void*>(buffer), TAM_MAX_MSJ_RECP_PCM);
         if (bytesLeidos > 0) {
             std::string msg = buffer;

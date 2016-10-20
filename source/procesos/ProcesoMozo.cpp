@@ -20,7 +20,7 @@ int ProcesoMozo::ejecutarMiTarea() {
     SignalHandler::getInstance()->registrarHandler(SIGINT, &sigint_handler);
 
     // Abro fifo de lectura para nuevos pedidos de comensales
-    // Se bloquea hasta que aparezca algún comensal // TODO creo
+    // Se bloquea hasta que aparezca algún comensal
     FifoLectura fifoNuevosPedidos(ARCHIVO_FIFO_NUEVOS_PEDIDOS);
     fifoNuevosPedidos.abrir();
 
@@ -139,7 +139,7 @@ void ProcesoMozo::recibirPedidosListos(FifoLectura fifoCocinado, FifoEscritura f
 void ProcesoMozo::entregarPedido(Pedido pedido, FifoEscritura fifoGastosMesa) {
     contabilizarPedido(pedido, fifoGastosMesa);
 
-    // TODO: acá TIENE que haber locks o semáforos por lo menos ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO: acá idealmente tiene que haber locks o semáforos por lo menos... ~~~~~~~~~~
     struct MesasConPedidos mcp =  shmMesas.leer();
     mcp.put( pedido.getNumMesa(),pedido );
     shmMesas.escribir( mcp );

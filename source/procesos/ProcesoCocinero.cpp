@@ -51,7 +51,6 @@ int ProcesoCocinero::ejecutarMiTarea() {
 
     Logger::log("INFO", CHEF, getpid(), "Proceso Cocinero finalizado.");
 
-    // Aca si no existía, se crea una nueva y se la elimina... TODO
     SignalHandler::destruir();
 
     return 0;
@@ -63,10 +62,9 @@ void ProcesoCocinero::enviarPedidoAMozos(FifoEscritura fifo, Pedido pedido) {
     Logger::log("INFO", CHEF, getpid(), "Envío a la cola cocinado.");
 }
 
-// TODO
 void ProcesoCocinero::cocinar(Pedido pedido) {
     int cantDePlatos = pedido.cantPlatos();
-    unsigned int tiempoPorPlato = 1;//TODO: hardcodeo
+    unsigned int tiempoPorPlato = 1;// hardcodeo
     unsigned int tiempoCocinando = 0 + cantDePlatos * tiempoPorPlato;
     Logger::log("INFO", CHEF, getpid(), "Cocinando pedido..." );
     sleep( tiempoCocinando );

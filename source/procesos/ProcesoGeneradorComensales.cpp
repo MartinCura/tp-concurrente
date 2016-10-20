@@ -23,7 +23,7 @@ int ProcesoGeneradorComensales::ejecutarMiTarea() {
         /* Tiempo que transcurre hasta que llegue el próximo grupo */
         unsigned tiempoEspera = (unsigned) Utils::generarRandom(10);
         sleep(tiempoEspera);
-        //dormir(tiempoEspera); /* TODO Es un "slepp" sin sleep asi que vale */
+
         /* Cantidad de comensales en el grupo que llegó */
         int cantComensales = Utils::generarRandom(MAX_COMENSALES_EN_GRUPO);
         std::string num_s = std::to_string(cantComensales);
